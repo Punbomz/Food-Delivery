@@ -14,17 +14,29 @@ datasource db {
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  posts Post[]
+  userID      Int     @id @default(autoincrement())
+  userFname   String
+  userLname   String
+  userGender  String
+  userEmail   String  @unique
+  userPhone   String
+  userPass    String
+  userPic     String?
 }
 
-model Post {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  author    User    @relation(fields: [authorId], references: [id])
-  authorId  Int
+model Shop {
+  shopID        Int       @id @default(autoincrement())
+  shopFname     String
+  shopLname     String
+  shopGender    String
+  shopEmail     String    @unique
+  shopPhone     String
+  shopPass      String
+  shopName      String
+  shopLocation  String
+  shopPic       String?
+  shopQR        String?
+  shopOpenTime  String    @default("09:00")
+  shopCloseTime String    @default("18:00")
+  shopOpen      Boolean   @default(false)
 }

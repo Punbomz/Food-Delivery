@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 
 export default function TestPage() {
-  const [cafeterias, setCafeterias] = useState(0);
+  const [cafeterias, setCafeterias] = useState("");
   const scrollRef1 = useRef<HTMLDivElement>(null);
   const scrollRef2 = useRef<HTMLDivElement>(null);
 
@@ -210,7 +210,7 @@ export default function TestPage() {
 
       { /* Mobile */ }
         <div className="block lg:hidden justify-center items-center">
-          {cafeterias === 0 &&
+          {cafeterias === "" &&
             <div className="justify-center text-center">
               <div className="bg-green-500 rounded-box p-5 text-white">
                 <h1 className="text-2xl font-bold m-3">🥗 วันนี้กินอะไรดี</h1>
@@ -233,7 +233,7 @@ export default function TestPage() {
                   </div>
                   <div className="card-actions">
                     <button className="btn btn-success text-white w-40"
-                    onClick={() => setCafeterias(1)}
+                    onClick={() => setCafeterias("ตึก 80")}
                     >เลือก</button>
                   </div>
                 </div>
@@ -255,19 +255,19 @@ export default function TestPage() {
                   </div>
                   <div className="card-actions">
                     <button className="btn btn-success text-white w-40"
-                    onClick={() => setCafeterias(2)}
+                    onClick={() => setCafeterias("บพิตรพิมุข")}
                     >เลือก</button>
                   </div>
                 </div>
               </div>
             </div>
           }
-          { cafeterias === 1 &&
+          { cafeterias === "ตึก 80" &&
             <div className="justify-center text-center">
               
               <div className="bg-base-500 border-2 border-green-600 rounded-box p-5">
                 <div className="flex justify-start">
-                  <button className="btn btn-ghost" onClick={() => setCafeterias(0)}>❮ กลับ</button>
+                  <button className="btn btn-ghost" onClick={() => setCafeterias("")}>❮ กลับ</button>
                 </div>
                 <div className="z-0">
                   <h1 className="text-2xl font-bold m-3 text-green-500">โรงอาหาร ตึก 80</h1>
@@ -341,12 +341,12 @@ export default function TestPage() {
             </div>
           }
           
-          { cafeterias === 2 &&
+          { cafeterias === "บพิตรพิมุข" &&
             <div className="justify-center text-center">
               
               <div className="bg-base-500 border-2 border-green-600 rounded-box p-5">
                 <div className="flex justify-start">
-                  <button className="btn btn-ghost" onClick={() => setCafeterias(0)}>❮ กลับ</button>
+                  <button className="btn btn-ghost" onClick={() => setCafeterias("")}>❮ กลับ</button>
                 </div>
                 <h1 className="text-2xl font-bold m-3 text-green-500">โรงอาหาร บพิตรพิมุข</h1>
                 <h2 className="m-3 text-green-800">เลือกร้านอาหารที่คุณต้องการ</h2>

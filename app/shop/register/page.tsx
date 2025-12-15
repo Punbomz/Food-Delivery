@@ -1,8 +1,48 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function shopRegister() {
+  const router = useRouter();
+
+  const [pass, setPass] = useState("");
+  const [passConfirm, setPassConfirm] = useState("");
+  const [passLengthValid, setPassLengthValid] = useState(true);
+
+  async function handleRegister(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const formData = new FormData(event.currentTarget);
+
+    const pass = formData.get("Pass") as string;
+    const passConfirm = formData.get("PassConfirm") as string;
+
+    if (pass !== passConfirm) {
+      alert("รหัสผ่านไม่ตรงกัน");
+      return;
+    }
+
+    const res = await fetch("/api/shop/register", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (res.status === 409) {
+      const data = await res.json();
+      alert(data.message);
+      return;
+    }
+
+    if (res.ok) {
+      alert("สมัครสมาชิกสำเร็จ!");
+      router.replace("/shop/login");
+    } else {
+      alert("เกิดข้อผิดพลาดในการสมัครสมาชิก");
+    }
+  }
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
 
@@ -22,7 +62,7 @@ export default function shopRegister() {
         <div className="flex w-full max-w-3xl items-center">
           <form className="bg-[#DAFFE4] w-full rounded-xl p-10 shadow-sm"
             method="post"
-            action="/api/shop/register"
+            onSubmit={handleRegister}
           >
           <fieldset>
             
@@ -36,6 +76,7 @@ export default function shopRegister() {
             </label>
             <input
               type="file"
+              name="Pic"
               className="
                 w-full
                 h-[46px]
@@ -53,11 +94,12 @@ export default function shopRegister() {
 
             <div className="block lg:flex lg:gap-5 justify-between">
               <div className="lg:w-1/2">
-                {/* Shop Name */}
+                {/*  Name */}
                 <label className="block text-sm text-black mb-1">
                   ชื่อร้าน <p className="text-red-500 inline">*</p>
                 </label>
                 <input
+                name ="Name"
                   type="text"
                   className="
                     w-full
@@ -81,6 +123,7 @@ export default function shopRegister() {
                   สถานที่ตั้ง <p className="text-red-500 inline">*</p>
                 </label>
                 <select
+                  name="Location"
                   className="
                     w-full
                     h-[46px]
@@ -94,10 +137,10 @@ export default function shopRegister() {
                     focus:outline-none
                   "
                   required
-                  defaultValue={"1"}
+                  defaultValue={"ตึก 80"}
                 >
-                  <option value="1">ตึก 80</option>
-                  <option value="2">บพิตรพิมุข</option>
+                  <option value="ตึก 80">ตึก 80</option>
+                  <option value="บพิตรพิมุข">บพิตรพิมุข</option>
                 </select>
               </div>
             </div>
@@ -109,6 +152,7 @@ export default function shopRegister() {
                   ชื่อ <p className="text-red-500 inline">*</p>
                 </label>
                 <input
+                  name="Fname"
                   type="text"
                   className="
                     w-full
@@ -132,6 +176,7 @@ export default function shopRegister() {
                   นามสกุล <p className="text-red-500 inline">*</p>
                 </label>
                 <input
+                  name="Lname"
                   type="text"
                   className="
                     w-full
@@ -155,6 +200,7 @@ export default function shopRegister() {
                   เพศ <p className="text-red-500 inline">*</p>
                 </label>
                 <select
+                  name="Gender"
                   className="
                     hidden lg:block
                     w-full
@@ -177,11 +223,11 @@ export default function shopRegister() {
 
                 <div className="lg:hidden mb-5">
                   <label className="mr-4">
-                    <input type="radio" name="gender" value="Male" defaultChecked /> ชาย
+                    <input type="radio" name="Gender" value="Male" defaultChecked /> ชาย
                   </label>
                   <br />
                   <label>
-                    <input type="radio" name="gender" value="Female " /> หญิง
+                    <input type="radio" name="Gender" value="Female " /> หญิง
                   </label>
                 </div>
               </div>
@@ -194,6 +240,7 @@ export default function shopRegister() {
                   Email <p className="text-red-500 inline">*</p>
                 </label>
                 <input
+                  name="Email"
                   type="email"
                   className="
                     w-full
@@ -217,6 +264,7 @@ export default function shopRegister() {
                   เบอร์โทร <p className="text-red-500 inline">*</p>
                 </label>
                 <input
+                  name = "Phone"
                   type="tel"
                   className="
                     w-full
@@ -241,6 +289,7 @@ export default function shopRegister() {
               รหัสผ่าน <p className="text-red-500 inline">*</p>
             </label>
             <input
+              name="Pass"
               type="password"
               className="
                 w-full
@@ -248,20 +297,28 @@ export default function shopRegister() {
                 bg-[#D9D9D9]
                 border-0
                 rounded-none
-                mb-6
+                mb-3
                 px-3
                 text-base
                 font-Inter
                 focus:outline-none
               "
               required
+              minLength={8}
+              onChange={(e) => {
+                setPass(e.target.value);
+                setPassLengthValid(e.target.value.length >= 8);
+              }}
+              value={pass}
             />
+            {!passLengthValid && (<div className="text-red-500 text-sm mb-3">รหัสผ่านต้องมีจำนวนขั้นต่ำ 8 ตัวอักษร</div>)}
 
             {/* Confirm Password */}
             <label className="block text-sm text-black mb-1">
               ยืนยันรหัสผ่าน <p className="text-red-500 inline">*</p>
             </label>
             <input
+              name="PassConfirm"
               type="password"
               className="
                 w-full
@@ -269,14 +326,18 @@ export default function shopRegister() {
                 bg-[#D9D9D9]
                 border-0
                 rounded-none
-                mb-6
+                mb-3
                 px-3
                 text-base
                 font-Inter
                 focus:outline-none
               "
               required
-            />
+              minLength={8}
+              onChange={(e) => setPassConfirm(e.target.value)}
+              value={passConfirm}
+              />
+              {pass !== passConfirm && (<div className="text-red-500 text-sm mb-3">รหัสผ่านไม่ตรงกัน</div>)}
 
             {/* Register Button */}
             <input
