@@ -4,8 +4,8 @@ import Link from 'next/link';
 
 export function Navbar() {
     return (
-        <div className="drawer">
-            <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
+        <div className="drawer fixed top-0 z-50 lg:drawer-open">
+            <input id="my-drawer-2" type="checkbox" className="drawer-toggle lg:hidden" />
             <div className="drawer-content flex flex-col">
                 {/* Navbar */}
                 <div className="navbar bg-[#9EFFAA] w-full pl-10 pr-10 shadow-sm">
