@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 
 export default function shopRegister() {
@@ -18,7 +20,11 @@ export default function shopRegister() {
 
         {/* Register Card */}
         <div className="flex w-full max-w-3xl items-center">
-          <fieldset className="bg-[#DAFFE4] w-full rounded-xl p-10 shadow-sm">
+          <form className="bg-[#DAFFE4] w-full rounded-xl p-10 shadow-sm"
+            method="post"
+            action="/api/shop/register"
+          >
+          <fieldset>
             
             <h1 className="text-2xl font-Inter text-black mb-6 text-center">
               สมัครสมาชิกร้านค้า
@@ -88,8 +94,9 @@ export default function shopRegister() {
                     focus:outline-none
                   "
                   required
+                  defaultValue={"1"}
                 >
-                  <option value="1" selected>ตึก 80</option>
+                  <option value="1">ตึก 80</option>
                   <option value="2">บพิตรพิมุข</option>
                 </select>
               </div>
@@ -162,8 +169,9 @@ export default function shopRegister() {
                     focus:outline-none
                   "
                   required
+                  defaultValue={"Male"}
                 >
-                  <option value="Male" selected>ชาย</option>
+                  <option value="Male">ชาย</option>
                   <option value="Female">หญิง</option>
                 </select>
 
@@ -271,8 +279,8 @@ export default function shopRegister() {
             />
 
             {/* Register Button */}
-            <button
-              type="button"
+            <input
+              type="submit"
               className="
                 w-3/5
                 h-[44px]
@@ -288,9 +296,8 @@ export default function shopRegister() {
                 active:scale-95
                 transition
               "
-            >
-              ยืนยันการสมัคร
-            </button>
+              value="ยืนยันการสมัคร"
+            />
             
             {/* Footer Links */}
             <div className="h-[6px] bg-[#D8D8D8] my-6 -mx-10"></div>
@@ -301,7 +308,8 @@ export default function shopRegister() {
               </Link>
             </div>
 
-          </fieldset>
+            </fieldset>
+          </form>
         </div>
       </div>
     </div>

@@ -26,15 +26,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-theme="light">
-      <Navbar />
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <Navbar />
         <div className="mt-15 mb-15">
           {children}
         </div>
+        <Footer />
       </body>
-      <Footer />
     </html>
   );
 }
