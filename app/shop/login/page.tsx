@@ -1,46 +1,101 @@
 export default function LoginForm() {
   return (
-    <div className="min-h-screen bg-gray-200 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-white flex flex-col">
+
       {/* Logo */}
-      <div className="mb-6">
-        <img 
-          src="/rmutk-logo.png" 
+      <div className="py-10 flex justify-center">
+        <img
+          src="/rmutk-logo.png"
           className="h-14 w-auto"
+          alt="RMUTK Logo"
         />
       </div>
 
-      {/* Login Form */}
-      <fieldset className="fieldset bg-green-50 border-0 rounded-lg w-full max-w-sm p-6 shadow-sm">
-        <legend className="fieldset-legend text-base font-normal text-gray-800 px-0 mb-4">
-          เข้าสู่ระบบ
-        </legend>
-        
-        <label className="label text-xs text-gray-700 mb-1 block">username</label>
-        <input 
-          type="text" 
-          className="input w-full bg-gray-300 border-0 rounded mb-3 px-3 py-2 text-sm" 
-        />
-        
-        <label className="label text-xs text-gray-700 mb-1 block">password</label>
-        <input 
-          type="password" 
-          className="input w-full bg-gray-300 border-0 rounded mb-4 px-3 py-2 text-sm" 
-        />
-        
-        <button className="btn bg-green-600 hover:bg-green-700 text-white w-full border-0 rounded px-4 py-2 text-sm font-normal">
-          เข้าสู่ระบบ
-        </button>
+      {/* Gray Middle Section */}
+      <div className="flex-1 bg-[#E5E5E5] flex items-center justify-center">
 
-        {/* Footer Links */}
-        <div className="flex justify-between mt-5 pt-4 border-t border-green-200">
-          <a href="#" className="text-xs text-gray-700 hover:text-green-700 no-underline">
-            สมัครสมาชิก
-          </a>
-          <a href="#" className="text-xs text-gray-700 hover:text-green-700 no-underline">
-            ลืมรหัสผ่าน
-          </a>
-        </div>
-      </fieldset>
+        {/* Login Card */}
+        <fieldset className="bg-[#DAFFE4] w-full max-w-[540px] rounded-xl p-10 shadow-sm">
+          
+          <h1 className="text-2xl font-Inter text-black mb-6">
+            เข้าสู่ระบบ
+          </h1>
+
+          {/* Username */}
+          <label className="block text-sm text-black mb-1">
+            username
+          </label>
+          <input
+            type="text"
+            className="
+              w-full
+              h-[46px]
+              bg-[#D9D9D9]
+              border-0
+              rounded-none
+              mb-5
+              px-3
+              text-base
+              font-Inter
+              focus:outline-none
+            "
+          />
+
+          {/* Password */}
+          <label className="block text-sm text-black mb-1">
+            password
+          </label>
+          <input
+            type="password"
+            className="
+              w-full
+              h-[46px]
+              bg-[#D9D9D9]
+              border-0
+              rounded-none
+              mb-6
+              px-3
+              text-base
+              font-Inter
+              focus:outline-none
+            "
+          />
+
+          {/* Login Button */}
+          <button
+            type="button"
+            className="
+              w-3/5
+              h-[44px]
+              bg-[#1EC067]
+              text-black
+              rounded-full
+              text-base
+              font-Inter
+              mx-auto
+              block
+              mb-6
+              hover:bg-[#19a95b]
+              active:scale-95
+              transition
+            "
+          >
+            เข้าสู่ระบบ
+          </button>
+          
+          {/* Footer Links */}
+          <div className="h-[6px] bg-[#D8D8D8] my-6 -mx-10"></div>
+          <div className="flex justify-between text-sm">
+            <a href="#" className="underline text-black hover:text-gray-600">
+              สมัครสมาชิก
+            </a>
+            <a href="#" className="underline text-black hover:text-gray-600">
+              ลืมรหัสผ่าน
+            </a>
+          </div>
+
+        </fieldset>
+      </div>
     </div>
   );
 }
