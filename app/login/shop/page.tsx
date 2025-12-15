@@ -1,6 +1,28 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function shopLogin() {
+  const router = useRouter();
+
+  async function handleLogin(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const formData = new FormData(event.currentTarget);
+    const res = await fetch("/api/login/shop", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (res.ok) {
+      alert("เข้าสู่ระบบสำเร็จ!");
+      window.location.href = "/shop/profile";
+    } else {
+      alert("อีเมลหรือรหัสผ่านไม่ถูกต้อง!");
+    }
+  }
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
 
@@ -18,7 +40,9 @@ export default function shopLogin() {
 
         {/* Login Card */}
         <div className="flex w-full max-w-xl items-center">
-          <fieldset className="bg-[#DAFFE4] w-full max-w-[540px] rounded-xl p-10 shadow-sm">
+          <form className="bg-[#DAFFE4] w-full max-w-[540px] rounded-xl p-10 shadow-sm"
+            onSubmit={handleLogin}>
+            <fieldset>
             
             <h1 className="text-2xl font-Inter text-black mb-6 text-center">
               เข้าสู่ระบบ
@@ -26,10 +50,11 @@ export default function shopLogin() {
 
             {/* Username */}
             <label className="block text-sm text-black mb-1">
-              username
+              Email
             </label>
             <input
-              type="text"
+              type="email"
+              name="Email"
               className="
                 w-full
                 h-[46px]
@@ -47,17 +72,18 @@ export default function shopLogin() {
 
             {/* Password */}
             <label className="block text-sm text-black mb-1">
-              password
+              Password
             </label>
             <input
               type="password"
+              name="Pass"
               className="
                 w-full
                 h-[46px]
                 bg-[#D9D9D9]
                 border-0
                 rounded-none
-                mb-6
+                mb-3
                 px-3
                 text-base
                 font-Inter
@@ -66,9 +92,15 @@ export default function shopLogin() {
               required
             />
 
-            {/* Login Button */}
-            <button
-              type="button"
+            <fieldset className="fieldset w-64 mb-6">
+              <label className="label">
+                <input name="Remember" type="checkbox" defaultChecked className="checkbox" />
+                Remember me
+              </label>
+            </fieldset>
+
+            <input
+              type="submit"
               className="
                 w-3/5
                 h-[44px]
@@ -84,14 +116,13 @@ export default function shopLogin() {
                 active:scale-95
                 transition
               "
-            >
-              เข้าสู่ระบบ
-            </button>
+              value="เข้าสู่ระบบ"
+            />
             
             {/* Footer Links */}
             <div className="h-[6px] bg-[#D8D8D8] my-6 -mx-10"></div>
             <div className="flex justify-between text-sm">
-              <Link href="/shop/register" className="underline text-black hover:text-gray-600">
+              <Link href="/register/shop" className="underline text-black hover:text-gray-600">
                 สมัครสมาชิก
               </Link>
               <Link href="#" className="underline text-black hover:text-gray-600">
@@ -99,7 +130,8 @@ export default function shopLogin() {
               </Link>
             </div>
 
-          </fieldset>
+            </fieldset>
+          </form>
         </div>
       </div>
     </div>

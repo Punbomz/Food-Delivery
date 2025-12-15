@@ -1,0 +1,73 @@
+import { prisma } from "@/lib/prisma";
+import bcrypt from "bcrypt";
+import { cookies } from "next/headers";
+import { randomBytes } from "crypto";
+
+export async function POST(request: Request) {
+  const formData = await request.formData();
+  const Email = formData.get("Email") as string;
+  const Pass = formData.get("Pass") as string;
+  const Remember = formData.get("Remember") === "on";
+
+  const shop = await prisma.shop.findUnique({
+    where: { shopEmail: Email },
+  });
+
+  if (!shop) {
+    return Response.json(
+      { message: "ไม่พบผู้ใช้!" },
+      { status: 401 }
+    );
+  }
+
+  // Compare Password
+  const isMatch = await bcrypt.compare(Pass, shop.shopPass);
+
+  if (!isMatch) {
+    return Response.json(
+      { message: "อีเมลหรือรหัสผ่านไม่ถูกต้อง!" },
+      { status: 401 }
+    );
+  }
+
+  // Create token
+  const token = randomBytes(32).toString("hex");
+
+  const expiresAt = new Date();
+  expiresAt.setDate(
+    expiresAt.getDate() + (Remember ? 30 : 1) // Remember = 30 Days, else 1 Day
+  );
+
+  await prisma.session.create({
+    data: {
+      token,
+      shopId: shop.shopID,
+      expiresAt,
+    },
+  });
+
+  const cookieStore = await cookies();
+
+  // Set session cookie
+  cookieStore.set("session", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    expires: expiresAt,
+    path: "/",
+  });
+
+  // Set role cookie for middleware
+  cookieStore.set("role", "shop", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    expires: expiresAt,
+    path: "/",
+  });
+
+  return Response.json(
+    { message: "เข้าสู่ระบบสำเร็จ!" },
+    { status: 200 }
+  );
+}

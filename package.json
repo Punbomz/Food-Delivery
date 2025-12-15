@@ -13,6 +13,7 @@
     "@prisma/adapter-pg": "^7.1.0",
     "@prisma/client": "^7.1.0",
     "@tailwindcss/postcss": "^4.1.18",
+    "bcrypt": "^6.0.0",
     "daisyui": "^5.5.14",
     "dotenv": "^17.2.3",
     "next": "16.0.10",
@@ -23,6 +24,7 @@
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/node": "^20.19.27",
     "@types/pg": "^8.16.0",
     "@types/react": "^19",

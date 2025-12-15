@@ -14,17 +14,68 @@ datasource db {
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  posts Post[]
+  userID     Int     @id @default(autoincrement())
+  userFname  String
+  userLname  String
+  userGender String
+  userEmail  String  @unique
+  userPhone  String
+  userPass   String
+  userPic    String?
+
+  sessions Session[]
 }
 
-model Post {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  author    User    @relation(fields: [authorId], references: [id])
-  authorId  Int
+model Shop {
+  shopID        Int     @id @default(autoincrement())
+  shopFname     String
+  shopLname     String
+  shopGender    String
+  shopEmail     String  @unique
+  shopPhone     String
+  shopPass      String
+  shopName      String
+  shopLocation  String
+  shopPic       String?
+  shopQR        String?
+  shopOpenTime  String  @default("09:00")
+  shopCloseTime String  @default("18:00")
+  shopOpen      Boolean @default(false)
+
+  sessions Session[]
+}
+
+model Admin {
+  adminID    Int     @id @default(autoincrement())
+  adminFname String
+  adminLname String
+  adminEmail String  @unique
+  adminPhone String
+  adminPass  String
+  adminPic   String?
+
+  sessions Session[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  // Make userId optional and add shopId
+  userId    Int?
+  user      User?    @relation(fields: [userId], references: [userID], onDelete: Cascade)
+  
+  shopId    Int?
+  shop      Shop?    @relation(fields: [shopId], references: [shopID], onDelete: Cascade)
+  
+  // Add adminId if you have admins
+  adminId   Int?
+  admin     Admin?   @relation(fields: [adminId], references: [adminID], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+  @@index([shopId])
+  @@index([adminId])
 }
