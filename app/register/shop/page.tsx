@@ -10,9 +10,11 @@ export default function shopRegister() {
   const [pass, setPass] = useState("");
   const [passConfirm, setPassConfirm] = useState("");
   const [passLengthValid, setPassLengthValid] = useState(true);
+  const [isLoading, setLoading] = useState(false);
 
   async function handleRegister(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setLoading(true);
 
     const formData = new FormData(event.currentTarget);
 
@@ -41,6 +43,7 @@ export default function shopRegister() {
     } else {
       alert("เกิดข้อผิดพลาดในการสมัครสมาชิก! กรุณาลองใหม่อีกครั้ง");
     }
+    setLoading(false);
   }
 
   return (
@@ -340,25 +343,47 @@ export default function shopRegister() {
               {pass !== passConfirm && (<div className="text-red-500 text-sm mb-3">รหัสผ่านไม่ตรงกัน</div>)}
 
             {/* Register Button */}
-            <input
-              type="submit"
-              className="
-                w-3/5
-                h-[44px]
-                bg-[#1EC067]
-                text-black
-                rounded-full
-                text-base
-                font-Inter
-                mx-auto
-                block
-                mb-6
-                hover:bg-[#19a95b]
-                active:scale-95
-                transition
-              "
-              value="ยืนยันการสมัคร"
-            />
+            { isLoading ? (
+              <button
+                className="
+                  w-3/5
+                  h-[44px]
+                  bg-[#1EC067]
+                  text-black
+                  rounded-full
+                  text-base
+                  font-Inter
+                  mx-auto
+                  block
+                  mb-6
+                  hover:bg-[#19a95b]
+                  active:scale-95
+                  transition
+                "
+              >
+              <span className="loading loading-spinner loading-sm"></span>
+              </button>
+            ) : (
+              <input
+                type="submit"
+                className="
+                  w-3/5
+                  h-[44px]
+                  bg-[#1EC067]
+                  text-black
+                  rounded-full
+                  text-base
+                  font-Inter
+                  mx-auto
+                  block
+                  mb-6
+                  hover:bg-[#19a95b]
+                  active:scale-95
+                  transition
+                "
+                value="ยืนยันการสมัคร"
+              />
+            )}
             
             {/* Footer Links */}
             <div className="h-[6px] bg-[#D8D8D8] my-6 -mx-10"></div>

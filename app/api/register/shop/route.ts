@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
+import { put } from "@vercel/blob"
 
 export async function POST(request: Request) {
   const formData = await request.formData();
@@ -28,7 +29,14 @@ export async function POST(request: Request) {
   let shopPic: string | null = null;
 
   if (picFile && picFile.size > 0) {
-    shopPic = picFile.name + "-" + Date.now().toString();
+    const fileExtension = picFile.name.substring(picFile.name.lastIndexOf('.'));
+    const fileNameWithoutExt = picFile.name.substring(0, picFile.name.lastIndexOf('.'));
+    
+    shopPic = fileNameWithoutExt + "-" + Date.now().toString() + fileExtension;
+    
+    const blob = await put('Profile/' + shopPic, picFile, {
+      access: 'public',
+    });
   }
 
   try {
