@@ -1,8 +1,49 @@
-"use client";
+"use client"
 
 import Link from 'next/link';
+import { useState, useEffect } from "react";
 
 export function Navbar() {
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+    
+    useEffect(() => {
+        checkAuth();
+    }, []);
+
+    const checkAuth = async () => {
+        try {
+            const res = await fetch("/api/auth/check", {
+                credentials: "include",
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setUser(data.user);
+            }
+        } catch (error) {
+            console.error("Auth check failed:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleLogout = async () => {
+        try {
+        const res = await fetch("/api/logout", {
+            method: "POST",
+            credentials: "include",
+        });
+
+        if (res.ok) {
+            alert("ออกจากระบบสำเร็จ!");
+            setUser(null);
+            window.location.href = "/";
+        }
+        } catch (error) {
+        console.error("Logout failed:", error);
+        }
+    };
+
     return (
         <div className="drawer fixed top-0 z-50 lg:drawer-open">
             <input id="my-drawer-2" type="checkbox" className="drawer-toggle lg:hidden" />
@@ -21,8 +62,27 @@ export function Navbar() {
                         <ul className="menu menu-horizontal px-5 gap-5">
                             <li><Link href="/">หน้าหลัก</Link></li>
                             <li><Link href="/">สั่งอาหาร</Link></li>
-                            <li><Link href="/shop/login">สำหรับร้านค้า</Link></li>
-                            <li className="bg-[#ADF38D] rounded-full w-20"><Link href="/customer/login" className="flex justify-center">Login</Link></li>
+                            <li><Link href="/login/shop">สำหรับร้านค้า</Link></li>
+                            {loading ? (
+                                <li className="w-20 flex justify-center">
+                                    <span className="loading loading-spinner loading-sm"></span>
+                                </li>
+                                ) : user ? (
+                                <li className="btn btn-error rounded-full w-20">
+                                    <div
+                                    onClick={handleLogout}
+                                    className="flex justify-center cursor-pointer"
+                                    >
+                                    Logout
+                                    </div>
+                                </li>
+                                ) : (
+                                <li className="btn bg-[#ADF38D] rounded-full w-20">
+                                    <Link href="/customer/login" className="flex justify-center">
+                                    Login
+                                    </Link>
+                                </li>
+                            )}
                         </ul>
                     </div>
                 </div>
@@ -42,19 +102,29 @@ export function Navbar() {
                         </svg>
                         สั่งอาหาร</Link>
                     </li>
-                    <li><Link href="/shop/login">
+                    <li><Link href="/login/shop">
                         <svg width="30" height="30" viewBox="0 0 47 41" fill="none" xmlns="httwww.w3.org/2000/svg">
                             <path d="M29.3749 35.8753V27.3337C29.3749 26.8806 29.1686 26.4461 28.8014 26.1257C28.4341 25.8053 27.936 25.6253 27.4166 25.6253H19.5833C19.0639 25.6253 18.5658 25.8053 18.1985 26.1257C17.8313 26.4461 17.6249 26.8806 17.6249 27.3337V35.8753M34.8074 17.6132C34.3991 17.2723 33.8558 17.082 33.2906 17.082C32.7255 17.082 32.1821 17.2723 31.7739 17.6132C30.8633 18.3709 29.6532 18.7936 28.3948 18.7936C27.1364 18.7936 25.9263 18.3709 25.0157 17.6132C24.6076 17.2728 24.0646 17.0828 23.4999 17.0828C22.9353 17.0828 22.3923 17.2728 21.9842 17.6132C21.0735 18.3714 19.863 18.7944 18.6041 18.7944C17.3452 18.7944 16.1347 18.3714 15.224 17.6132C14.8158 17.2723 14.2725 17.082 13.7073 17.082C13.1422 17.082 12.5988 17.2723 12.1906 17.6132C11.311 18.3455 10.1505 18.766 8.93509 18.7929C7.71966 18.8199 6.53621 18.4514 5.61509 17.7591C4.69397 17.0668 4.10108 16.1003 3.95183 15.0477C3.80259 13.9951 4.10765 12.9318 4.80766 12.0646L10.4653 4.91691C10.8243 4.45482 11.3075 4.0765 11.8729 3.81503C12.4382 3.55355 13.0684 3.41689 13.7083 3.41699H33.2916C33.9296 3.41678 34.558 3.55253 35.1222 3.81245C35.6864 4.07237 36.1692 4.44858 36.5287 4.90837L42.1981 12.0697C42.8983 12.9376 43.203 14.0018 43.0528 15.0549C42.9026 16.108 42.3083 17.0747 41.3857 17.7665C40.4632 18.4582 39.2784 18.8256 38.0623 18.797C36.8461 18.7683 35.6858 18.3457 34.8074 17.6115M7.83328 18.7066V32.4587C7.83328 33.3648 8.24593 34.2339 8.98045 34.8746C9.71496 35.5154 10.7112 35.8753 11.7499 35.8753H35.2499C36.2887 35.8753 37.2849 35.5154 38.0194 34.8746C38.754 34.2339 39.1666 33.3648 39.1666 32.4587V18.7066" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                         สำหรับร้านค้า</Link>
                     </li>
-                    <li>
-                        <Link href="/customer/login">
-                        <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="httwww.w3.org/2000/svg">
-                            <path d="M11.2083 21.4167L18.5 14.125M18.5 14.125L11.2083 6.83333M18.5 14.125H1M18.5 1H24.3333C25.1069 1 25.8487 1.30729 26.3957 1.85427C26.9427 2.40125 27.25 3.14312 27.25 3.91667V24.3333C27.25 25.1069 26.9427 25.8487 26.3957 26.3957C25.8487 26.9427 25.1069 27.25 24.3333 27.25H18.5" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                        Login</Link>
-                    </li>
+                    { user ? (
+                        <li>
+                            <div onClick={handleLogout}>
+                            <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="httwww.w3.org/2000/svg">
+                                <path d="M11.2083 21.4167L18.5 14.125M18.5 14.125L11.2083 6.83333M18.5 14.125H1M18.5 1H24.3333C25.1069 1 25.8487 1.30729 26.3957 1.85427C26.9427 2.40125 27.25 3.14312 27.25 3.91667V24.3333C27.25 25.1069 26.9427 25.8487 26.3957 26.3957C25.8487 26.9427 25.1069 27.25 24.3333 27.25H18.5" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            Logout</div>
+                        </li>
+                    ) : (
+                        <li>
+                            <Link href="/customer/login">
+                            <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="httwww.w3.org/2000/svg">
+                                <path d="M11.2083 21.4167L18.5 14.125M18.5 14.125L11.2083 6.83333M18.5 14.125H1M18.5 1H24.3333C25.1069 1 25.8487 1.30729 26.3957 1.85427C26.9427 2.40125 27.25 3.14312 27.25 3.91667V24.3333C27.25 25.1069 26.9427 25.8487 26.3957 26.3957C25.8487 26.9427 25.1069 27.25 24.3333 27.25H18.5" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            Login</Link>
+                        </li>
+                    )}
                 </ul>
             </div>
         </div>

@@ -20,11 +20,11 @@ export default function shopRegister() {
     const passConfirm = formData.get("PassConfirm") as string;
 
     if (pass !== passConfirm) {
-      alert("รหัสผ่านไม่ตรงกัน");
+      alert("รหัสผ่านไม่ตรงกัน!");
       return;
     }
 
-    const res = await fetch("/api/shop/register", {
+    const res = await fetch("/api/register/shop", {
       method: "POST",
       body: formData,
     });
@@ -39,7 +39,7 @@ export default function shopRegister() {
       alert("สมัครสมาชิกสำเร็จ!");
       router.replace("/shop/login");
     } else {
-      alert("เกิดข้อผิดพลาดในการสมัครสมาชิก");
+      alert("เกิดข้อผิดพลาดในการสมัครสมาชิก! กรุณาลองใหม่อีกครั้ง");
     }
   }
 
@@ -364,7 +364,7 @@ export default function shopRegister() {
             <div className="h-[6px] bg-[#D8D8D8] my-6 -mx-10"></div>
             <div className="flex justify-between text-sm">
               <p>มีบัญชีแล้ว?</p>
-              <Link href="/shop/login" className="underline text-black hover:text-gray-600">
+              <Link href="/login/shop" className="underline text-black hover:text-gray-600">
                 เข้าสู่ระบบ
               </Link>
             </div>
