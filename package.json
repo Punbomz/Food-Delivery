@@ -13,6 +13,7 @@
     "@prisma/adapter-pg": "^7.1.0",
     "@prisma/client": "^7.1.0",
     "@tailwindcss/postcss": "^4.1.18",
+    "@vercel/blob": "^2.0.0",
     "bcrypt": "^6.0.0",
     "daisyui": "^5.5.14",
     "dotenv": "^17.2.3",

@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function shopLogin() {
   const router = useRouter();
+  const [isLoading, setLoading] = useState(false);
 
   async function handleLogin(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setLoading(true);
 
     const formData = new FormData(event.currentTarget);
     const res = await fetch("/api/login/shop", {
@@ -21,6 +24,7 @@ export default function shopLogin() {
     } else {
       alert("อีเมลหรือรหัสผ่านไม่ถูกต้อง!");
     }
+    setLoading(false);
   }
 
   return (
@@ -99,25 +103,47 @@ export default function shopLogin() {
               </label>
             </fieldset>
 
-            <input
-              type="submit"
-              className="
-                w-3/5
-                h-[44px]
-                bg-[#1EC067]
-                text-black
-                rounded-full
-                text-base
-                font-Inter
-                mx-auto
-                block
-                mb-6
-                hover:bg-[#19a95b]
-                active:scale-95
-                transition
-              "
-              value="เข้าสู่ระบบ"
-            />
+            { isLoading ? (
+              <button
+                className="
+                  w-3/5
+                  h-[44px]
+                  bg-[#1EC067]
+                  text-black
+                  rounded-full
+                  text-base
+                  font-Inter
+                  mx-auto
+                  block
+                  mb-6
+                  hover:bg-[#19a95b]
+                  active:scale-95
+                  transition
+                "
+              >
+              <span className="loading loading-spinner loading-sm"></span>
+              </button>
+            ) : (
+              <input
+                type="submit"
+                className="
+                  w-3/5
+                  h-[44px]
+                  bg-[#1EC067]
+                  text-black
+                  rounded-full
+                  text-base
+                  font-Inter
+                  mx-auto
+                  block
+                  mb-6
+                  hover:bg-[#19a95b]
+                  active:scale-95
+                  transition
+                "
+                value="เข้าสู่ระบบ"
+              />
+            )}
             
             {/* Footer Links */}
             <div className="h-[6px] bg-[#D8D8D8] my-6 -mx-10"></div>

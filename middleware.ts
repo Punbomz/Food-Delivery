@@ -30,6 +30,9 @@ export async function middleware(request: NextRequest) {
 
   // No session - only allow access to auth routes and home
   if (!token) {
+    if (pathname === "/login/shop" || pathname === "/login/admin" || pathname === "/login/customer") {
+      return NextResponse.next();
+    }
     if (isProtectedRoute) {
       return NextResponse.redirect(new URL("/", request.url));
     }
