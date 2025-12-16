@@ -20,7 +20,7 @@ export default function shopLogin() {
 
     if (res.ok) {
       alert("เข้าสู่ระบบสำเร็จ!");
-      window.location.href = "/shop/profile";
+      window.location.href = "/shop";
     } else {
       alert("อีเมลหรือรหัสผ่านไม่ถูกต้อง!");
     }
@@ -28,126 +28,88 @@ export default function shopLogin() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen flex flex-col align-middle p-30">
 
       {/* Logo */}
-      <div className="py-10 flex justify-center">
+      <div className="w-full h-25 flex justify-center">
         <img
-          src="/rmutk-logo.png"
-          className="h-14 w-auto"
+          src="/RMUTK_Logo.png"
+          className="h-25 w-auto"
           alt="RMUTK Logo"
         />
       </div>
 
       {/* Gray Middle Section */}
-      <div className="bg-[#E5E5E5] flex p-10 justify-center">
+      <div className="w-full flex p-10 justify-center">
 
         {/* Login Card */}
-        <div className="flex w-full max-w-xl items-center">
-          <form className="bg-[#DAFFE4] w-full max-w-[540px] rounded-xl p-10 shadow-sm"
-            onSubmit={handleLogin}>
-            <fieldset>
+        <div className="flex w-full max-w-xl items-center justify-center">
+          <form className="justify-center" onSubmit={handleLogin}>
+            <fieldset className="fieldset bg-base-200 border-base-300 rounded-box md:w-2xl sm:w-2xl border p-5 shadow-md">
             
-            <h1 className="text-2xl font-Inter text-black mb-6 text-center">
+            <h1 className="text-2xl font-Inter text-black mx-auto text-center">
               เข้าสู่ระบบ
             </h1>
 
-            {/* Username */}
-            <label className="block text-sm text-black mb-1">
-              Email
-            </label>
-            <input
-              type="email"
-              name="Email"
-              className="
-                w-full
-                h-[46px]
-                bg-[#D9D9D9]
-                border-0
-                rounded-none
-                mb-5
-                px-3
-                text-base
-                font-Inter
-                focus:outline-none
-              "
-              required
-            />
+            <div className="space-y-2 w-xs mx-auto">
+              <label className="label">Email</label>
+              <div>
+                <input name="Email" type="email" className="input w-full" placeholder="Email" required />
+              </div>
 
-            {/* Password */}
-            <label className="block text-sm text-black mb-1">
-              Password
-            </label>
-            <input
-              type="password"
-              name="Pass"
-              className="
-                w-full
-                h-[46px]
-                bg-[#D9D9D9]
-                border-0
-                rounded-none
-                mb-3
-                px-3
-                text-base
-                font-Inter
-                focus:outline-none
-              "
-              required
-            />
+              <label className="label">Password</label>
+              <div>
+                <input name="Pass" type="password" className="input  w-full" placeholder="Password" required/>
+              </div>
 
-            <fieldset className="fieldset w-64 mb-6">
               <label className="label">
                 <input name="Remember" type="checkbox" defaultChecked className="checkbox" />
                 Remember me
               </label>
-            </fieldset>
+            </div>
 
-            { isLoading ? (
-              <button
-                className="
-                  w-3/5
-                  h-[44px]
-                  bg-[#1EC067]
-                  text-black
-                  rounded-full
-                  text-base
-                  font-Inter
-                  mx-auto
-                  block
-                  mb-6
-                  hover:bg-[#19a95b]
-                  active:scale-95
-                  transition
-                "
-              >
-              <span className="loading loading-spinner loading-sm"></span>
-              </button>
-            ) : (
-              <input
-                type="submit"
-                className="
-                  w-3/5
-                  h-[44px]
-                  bg-[#1EC067]
-                  text-black
-                  rounded-full
-                  text-base
-                  font-Inter
-                  mx-auto
-                  block
-                  mb-6
-                  hover:bg-[#19a95b]
-                  active:scale-95
-                  transition
-                "
-                value="เข้าสู่ระบบ"
-              />
-            )}
+            <div className="flex justify-center items-center w-xs mx-auto">
+              { isLoading ? (
+                <button
+                  className="
+                    w-2/5
+                    h-[44px]
+                    bg-[#1EC067]
+                    text-black
+                    rounded-full
+                    text-base
+                    font-Inter
+                    block
+                    hover:bg-[#19a95b]
+                    active:scale-95
+                    transition
+                  "
+                >
+                <span className="loading loading-spinner loading-sm"></span>
+                </button>
+              ) : (
+                <input
+                  type="submit"
+                  className="
+                    w-2/5
+                    h-[44px]
+                    bg-[#1EC067]
+                    text-black
+                    rounded-full
+                    text-base
+                    font-Inter
+                    block
+                    hover:bg-[#19a95b]
+                    active:scale-95
+                    transition
+                  "
+                  value="เข้าสู่ระบบ"
+                />
+              )}
+            </div>
             
             {/* Footer Links */}
-            <div className="h-[6px] bg-[#D8D8D8] my-6 -mx-10"></div>
-            <div className="flex justify-between text-sm">
+            <div className="flex justify-between text-sm p-5 w-xs mx-auto">
               <Link href="/register/shop" className="underline text-black hover:text-gray-600">
                 สมัครสมาชิก
               </Link>
