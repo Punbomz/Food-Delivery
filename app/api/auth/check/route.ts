@@ -1,6 +1,6 @@
-// app/api/auth/check/route.ts
 import { getCurrentUser } from "@/lib/loginHelper";
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
@@ -12,14 +12,23 @@ export async function GET() {
         { status: 401 }
       );
     }
-    
+
     const [user, role] = result;
+    let pic = "";
     
+    if(role === "shop") {
+      const shopUser = await prisma.shop.findUnique({
+        where: { shopID: user.id },
+      });
+      pic = shopUser?.shopPic ?? "";
+    }
+
     return NextResponse.json(
       { 
         user: {
           ...user,
-          role
+          role,
+          pic,
         },
         authenticated: true 
       },

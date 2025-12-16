@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function shopRegister() {
@@ -11,6 +11,20 @@ export default function shopRegister() {
   const [passConfirm, setPassConfirm] = useState("");
   const [passLengthValid, setPassLengthValid] = useState(true);
   const [isLoading, setLoading] = useState(false);
+  const [profilePreview, setProfilePreview] = useState<string | null>(null);
+  const [qrPreview, setQrPreview] = useState<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (profilePreview) URL.revokeObjectURL(profilePreview);
+    };
+  }, [profilePreview]);
+
+  useEffect(() => {
+    return () => {
+      if (qrPreview) URL.revokeObjectURL(qrPreview);
+    };
+  }, [qrPreview]);
 
   async function handleRegister(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -47,98 +61,97 @@ export default function shopRegister() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen flex flex-col align-middle p-30">
 
       {/* Logo */}
-      <div className="py-10 flex justify-center">
+      <div className="w-full h-25 flex justify-center">
         <img
-          src="/rmutk-logo.png"
-          className="h-14 w-auto"
+          src="/RMUTK_Logo.png"
+          className="h-25 w-auto"
           alt="RMUTK Logo"
         />
       </div>
 
       {/* Gray Middle Section */}
-      <div className="bg-[#E5E5E5] flex p-10 justify-center">
+      <div className="w-full flex p-10 justify-center">
 
         {/* Register Card */}
-        <div className="flex w-full max-w-3xl items-center">
-          <form className="bg-[#DAFFE4] w-full rounded-xl p-10 shadow-sm"
-            method="post"
-            onSubmit={handleRegister}
-          >
-          <fieldset>
+        <div className="flex w-full max-w-xl items-center justify-center">
+          <form className="justify-center" onSubmit={handleRegister}>
+            <fieldset className="fieldset bg-base-200 border-base-300 rounded-box md:w-2xl sm:w-2xl border p-10 shadow-md">
             
-            <h1 className="text-2xl font-Inter text-black mb-6 text-center">
+            <h1 className="text-2xl font-Inter text-black mx-auto text-center">
               สมัครสมาชิกร้านค้า
             </h1>
 
-            {/* Profile */}
-            <label className="block text-sm text-black mb-1">
-              รูปโปรไฟล์
-            </label>
-            <input
-              type="file"
-              name="Pic"
-              className="
-                w-full
-                h-[46px]
-                bg-[#D9D9D9]
-                border-0
-                rounded-none
-                mb-6
-                px-3
-                text-base
-                font-Inter
-                focus:outline-none
-              "
-              accept="image/*"
-            />
-
+            {/* Profile & QR Code */}
             <div className="block lg:flex lg:gap-5 justify-between">
-              <div className="lg:w-1/2">
-                {/*  Name */}
+              <div className="flex-1/2 text-center mt-3">
+                {profilePreview && (
+                  <div className="avatar m-3">
+                    <div className="ring-primary ring-offset-base-100 w-24 rounded-full ring-2 ring-offset-2">
+                      <img src={profilePreview} alt="prfile"/>
+                    </div>
+                  </div>
+                )}
                 <label className="block text-sm text-black mb-1">
-                  ชื่อร้าน <p className="text-red-500 inline">*</p>
+                  รูปโปรไฟล์
                 </label>
-                <input
-                name ="Name"
-                  type="text"
-                  className="
-                    w-full
-                    h-[46px]
-                    bg-[#D9D9D9]
-                    border-0
-                    rounded-none
-                    mb-5
-                    px-3
-                    text-base
-                    font-Inter
-                    focus:outline-none
-                  "
-                  required
-                />
+                <div>  
+                  <input name="Pic" type="file" accept="image/*" className="file-input w-xs" required
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setProfilePreview(URL.createObjectURL(file));
+                      }
+                    }}
+                  />
+                </div>
               </div>
 
-              <div className="lg:w-1/2">
-                {/* Location */}
+              <div className="flex-1/2 text-center mt-3">
+                {qrPreview && (
+                  <div className="avatar m-3">
+                    <div className="w-24 rounded">
+                      <img src={qrPreview} alt="QR Code" />
+                    </div>
+                  </div>
+                )}
                 <label className="block text-sm text-black mb-1">
+                  คิวอาร์โค้ดรับเงิน
+                </label>
+                <div>  
+                  <input name="QR" type="file" accept="image/*" className="file-input w-xs" required
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setQrPreview(URL.createObjectURL(file));
+                      }
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="block lg:flex lg:gap-5 justify-between">
+              <div className="flex-1/2">
+                {/*  Name */}
+                <label className="block text-sm text-black mb-1 mt-5">
+                  ชื่อร้าน <p className="text-red-500 inline">*</p>
+                </label>
+                <div>
+                  <input name="Name" type="text" className="input w-full" placeholder="ระบุชื่อร้าน" required />
+                </div>
+              </div>
+
+              <div className="flex-1/2">
+                {/* Location */}
+                <label className="block text-sm text-black mb-1 mt-5">
                   สถานที่ตั้ง <p className="text-red-500 inline">*</p>
                 </label>
                 <select
                   name="Location"
-                  className="
-                    w-full
-                    h-[46px]
-                    bg-[#D9D9D9]
-                    border-0
-                    rounded-none
-                    mb-5
-                    px-3
-                    text-base
-                    font-Inter
-                    focus:outline-none
-                  "
+                  className="w-full select"
                   required
                   defaultValue={"ตึก 80"}
                 >
@@ -149,74 +162,29 @@ export default function shopRegister() {
             </div>
 
             <div className="block lg:flex lg:gap-5 justify-between">
-              <div className="lg:w-1/2">
+              <div className="flex-1/2">
                 {/* First Name */}
-                <label className="block text-sm text-black mb-1">
+                <label className="block text-sm text-black mb-1 mt-5">
                   ชื่อ <p className="text-red-500 inline">*</p>
                 </label>
-                <input
-                  name="Fname"
-                  type="text"
-                  className="
-                    w-full
-                    h-[46px]
-                    bg-[#D9D9D9]
-                    border-0
-                    rounded-none
-                    mb-5
-                    px-3
-                    text-base
-                    font-Inter
-                    focus:outline-none
-                  "
-                  required
-                />
+                <input name="Fname" type="text" className="input w-full" placeholder="ระบุชื่อ" required />
               </div>
 
-              <div className="lg:w-1/2">
+              <div className="flex-1/2">
                 {/* Last Name */}
-                <label className="block text-sm text-black mb-1">
+                <label className="block text-sm text-black mb-1 mt-5">
                   นามสกุล <p className="text-red-500 inline">*</p>
                 </label>
-                <input
-                  name="Lname"
-                  type="text"
-                  className="
-                    w-full
-                    h-[46px]
-                    bg-[#D9D9D9]
-                    border-0
-                    rounded-none
-                    mb-5
-                    px-3
-                    text-base
-                    font-Inter
-                    focus:outline-none
-                  "
-                  required
-                />
+                <input name="Lname" type="text" className="input w-full" placeholder="ระบุนามสกุล" required />
               </div>
 
-              <div className="lg:w-1/3">
+              <div className="flex-1/3">
                 {/* Gender */}
-                <label className="block text-sm text-black mb-1">
+                <label className="block text-sm text-black mb-1 mt-5">
                   เพศ <p className="text-red-500 inline">*</p>
                 </label>
                 <select
-                  name="Gender"
-                  className="
-                    hidden lg:block
-                    w-full
-                    h-[46px]
-                    bg-[#D9D9D9]
-                    border-0
-                    rounded-none
-                    mb-5
-                    px-3
-                    text-base
-                    font-Inter
-                    focus:outline-none
-                  "
+                  name="Gender" className="w-full select hidden lg:block"
                   required
                   defaultValue={"Male"}
                 >
@@ -224,13 +192,12 @@ export default function shopRegister() {
                   <option value="Female">หญิง</option>
                 </select>
 
-                <div className="lg:hidden mb-5">
+                <div className="flex lg:hidden gap-5">
                   <label className="mr-4">
-                    <input type="radio" name="Gender" value="Male" defaultChecked /> ชาย
+                    <input type="radio" className="radio" name="Gender" value="Male" defaultChecked /> ชาย
                   </label>
-                  <br />
                   <label>
-                    <input type="radio" name="Gender" value="Female " /> หญิง
+                    <input type="radio" className="radio" name="Gender" value="Female " /> หญิง
                   </label>
                 </div>
               </div>
@@ -239,127 +206,57 @@ export default function shopRegister() {
             <div className="block lg:flex lg:gap-5 justify-between">
               <div className="lg:w-1/2">
                 {/* Email */}
-                <label className="block text-sm text-black mb-1">
+                <label className="block text-sm text-black mb-1 mt-5">
                   Email <p className="text-red-500 inline">*</p>
                 </label>
-                <input
-                  name="Email"
-                  type="email"
-                  className="
-                    w-full
-                    h-[46px]
-                    bg-[#D9D9D9]
-                    border-0
-                    rounded-none
-                    mb-5
-                    px-3
-                    text-base
-                    font-Inter
-                    focus:outline-none
-                  "
-                  required
-                />
+                <input name="Email" type="email" className="input w-full" placeholder="ระบุอีเมล" required />
               </div>
 
               <div className="lg:w-1/2">
                 {/* Tel */}
-                <label className="block text-sm text-black mb-1">
+                <label className="block text-sm text-black mb-1 mt-5">
                   เบอร์โทร <p className="text-red-500 inline">*</p>
                 </label>
-                <input
-                  name = "Phone"
-                  type="tel"
-                  className="
-                    w-full
-                    h-[46px]
-                    bg-[#D9D9D9]
-                    border-0
-                    rounded-none
-                    mb-5
-                    px-3
-                    text-base
-                    font-Inter
-                    focus:outline-none
-                  "
-                  required
-                  pattern="[0-9]{10}"
-                />
+                <input name="Phone" type="tel" className="input w-full" placeholder="ระบุเบอร์โทรศัพท์ (ไม่มี - )" required pattern="[0-9]{10}"/>
               </div>
             </div>
 
             {/* Password */}
-            <label className="block text-sm text-black mb-1">
+            <label className="block text-sm text-black mb-1 mt-5">
               รหัสผ่าน <p className="text-red-500 inline">*</p>
             </label>
-            <input
-              name="Pass"
-              type="password"
-              className="
-                w-full
-                h-[46px]
-                bg-[#D9D9D9]
-                border-0
-                rounded-none
-                mb-3
-                px-3
-                text-base
-                font-Inter
-                focus:outline-none
-              "
-              required
-              minLength={8}
+            <input name="Pass" type="password" className="input w-full" placeholder="ระบุรหัสผ่าน" required minLength={8}
               onChange={(e) => {
                 setPass(e.target.value);
                 setPassLengthValid(e.target.value.length >= 8);
               }}
-              value={pass}
-            />
+              value={pass}/>
             {!passLengthValid && (<div className="text-red-500 text-sm mb-3">รหัสผ่านต้องมีจำนวนขั้นต่ำ 8 ตัวอักษร</div>)}
 
             {/* Confirm Password */}
-            <label className="block text-sm text-black mb-1">
+            <label className="block text-sm text-black mb-1 mt-5">
               ยืนยันรหัสผ่าน <p className="text-red-500 inline">*</p>
             </label>
-            <input
-              name="PassConfirm"
-              type="password"
-              className="
-                w-full
-                h-[46px]
-                bg-[#D9D9D9]
-                border-0
-                rounded-none
-                mb-3
-                px-3
-                text-base
-                font-Inter
-                focus:outline-none
-              "
-              required
-              minLength={8}
+            <input name="PassConfirm" type="password" className="input w-full" placeholder="ยืนยันรหัสผ่าน" required minLength={8}
               onChange={(e) => setPassConfirm(e.target.value)}
-              value={passConfirm}
-              />
+              value={passConfirm}/>
               {pass !== passConfirm && (<div className="text-red-500 text-sm mb-3">รหัสผ่านไม่ตรงกัน</div>)}
 
             {/* Register Button */}
+            <div className="flex justify-center items-center w-xs mx-auto mt-5">
             { isLoading ? (
               <button
                 className="
-                  w-3/5
-                  h-[44px]
-                  bg-[#1EC067]
-                  text-black
-                  rounded-full
-                  text-base
-                  font-Inter
-                  mx-auto
-                  block
-                  mb-6
-                  hover:bg-[#19a95b]
-                  active:scale-95
-                  transition
-                "
+                  btn
+                    btn-success
+                    rounded-full
+                    text-base
+                    font-Inter
+                    block
+                    hover:bg-[#19a95b]
+                    active:scale-95
+                    transition
+                  "
               >
               <span className="loading loading-spinner loading-sm"></span>
               </button>
@@ -367,27 +264,23 @@ export default function shopRegister() {
               <input
                 type="submit"
                 className="
-                  w-3/5
-                  h-[44px]
-                  bg-[#1EC067]
-                  text-black
-                  rounded-full
-                  text-base
-                  font-Inter
-                  mx-auto
-                  block
-                  mb-6
-                  hover:bg-[#19a95b]
-                  active:scale-95
-                  transition
-                "
+                  btn
+                    btn-success
+                    rounded-full
+                    text-base
+                    font-Inter
+                    block
+                    hover:bg-[#19a95b]
+                    active:scale-95
+                    transition
+                  "
                 value="ยืนยันการสมัคร"
               />
             )}
+            </div>
             
             {/* Footer Links */}
-            <div className="h-[6px] bg-[#D8D8D8] my-6 -mx-10"></div>
-            <div className="flex justify-between text-sm">
+            <div className="flex justify-center gap-5 text-sm p-5 w-xs mx-auto">
               <p>มีบัญชีแล้ว?</p>
               <Link href="/login/shop" className="underline text-black hover:text-gray-600">
                 เข้าสู่ระบบ

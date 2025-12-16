@@ -1,4 +1,3 @@
-// app/api/logout/route.ts
 import { clearSession } from "@/lib/loginHelper";
 import { NextResponse } from "next/server";
 
