@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Sidebar } from "./components/sidebar"
+import { Sidebar  } from "../components/sidebar";
 
 interface User {
     shopID: number;
@@ -21,7 +21,7 @@ interface User {
     [key: string]: any;
 }
 
-export default function shopProfile() {
+export default function shopReport() {
   const [shopID, setID] = useState<number | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isEditing, setEdit] = useState(false);
@@ -125,7 +125,7 @@ export default function shopProfile() {
                   <div className="justify-center text-center">
                     <div className="avatar">
                       <div className="w-50 rounded">
-                        <img src={ user?.shopPic !== "" ? (user?.shopPic) : ("/profile.jpg")} alt="Profile" />
+                        <img src="https://img.daisyui.com/images/profile/demo/batperson@192.webp" />
                       </div>
                     </div>
                     { isEditing && (
@@ -150,25 +150,23 @@ export default function shopProfile() {
                 <div className="mt-10 flex items-center justify-center">
                   <div className="avatar">
                     <div className="w-50 rounded">
-                      <img src={ user?.shopQR !== "" ? (user?.shopQR) : ("")} alt="QR Code" />
+                      <img src="https://img.daisyui.com/images/profile/demo/batperson@192.webp" />
                     </div>
                   </div>
                 </div>
-                { isEditing && (
-                  <div className="mt-5 flex items-center justify-center">
-                    <input type="file" className="file-input" />
-                  </div>
-                )}
+                <div className="mt-5 flex items-center justify-center">
+                  <input type="file" className="file-input" />
+                </div>
                 <div className="mt-10 items-center justify-center">
                   <Link href="shop/changepass" className="mt-2 flex items-center justify-center underline text-lg">แก้ไขรหัสผ่าน</Link>
                   <Link href="shop/history" className="mt-2 flex items-center justify-center underline text-lg">ประวัติการใช้งาน</Link>
                 </div>
-                <div className="mt-10 flex items-center justify-center gap-2">
+                <div className="mt-10 flex items-center justify-center gap-3">
                   <i className='far'>&#xf017;</i>
                   <span className="text-sm lg:text-xl">เปิดตั้งแต่</span>
-                  <input value={user?.shopOpenTime || ""} type="time" className="input w-25 text-center" required disabled={!isEditing} />
+                  <input value={user?.shopOpenTime || ""} type="time" className="input w-20 text-center" required disabled={!isEditing} />
                   <span className="text-sm lg:text-xl"> - </span>
-                  <input value={user?.shopCloseTime || ""} type="time" className="input w-25 text-center" required disabled={!isEditing} />
+                  <input value={user?.shopCloseTime || ""} type="time" className="input w-20 text-center" required disabled={!isEditing} />
                 </div>
               </div>
 

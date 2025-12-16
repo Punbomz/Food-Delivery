@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 interface User {
     name: string;
     role: string;
+    pic: string;
     [key: string]: any;
 }
 
@@ -105,9 +106,9 @@ export function Navbar() {
                         ) : role === "shop" && (
                             <>
                             <div className='hidden md:flex items-center gap-3'>
-                                <Link href="/shop/profile" className="avatar p-2">
+                                <Link href="/shop" className="avatar p-2">
                                     <div className="ring-primary ring-offset-base-100 w-10 rounded-full ring-2 ring-offset-2">
-                                        <img src="https://img.daisyui.com/images/profile/demo/spiderperson@192.webp" />
+                                        <img src={ user.pic !== "" ? (user.pic) : ("/profile.jpg")} />
                                     </div>
                                 </Link>
                                 <div className='bg-white rounded-full flex text-xl p-2'>{user.name}</div>

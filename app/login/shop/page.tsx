@@ -45,7 +45,7 @@ export default function shopLogin() {
         {/* Login Card */}
         <div className="flex w-full max-w-xl items-center justify-center">
           <form className="justify-center" onSubmit={handleLogin}>
-            <fieldset className="fieldset bg-base-200 border-base-300 rounded-box md:w-2xl sm:w-2xl border p-5 shadow-md">
+            <fieldset className="fieldset bg-base-200 border-base-300 rounded-box md:w-xl sm:w-2xl border p-10 shadow-md">
             
             <h1 className="text-2xl font-Inter text-black mx-auto text-center">
               เข้าสู่ระบบ
@@ -72,10 +72,8 @@ export default function shopLogin() {
               { isLoading ? (
                 <button
                   className="
-                    w-2/5
-                    h-[44px]
-                    bg-[#1EC067]
-                    text-black
+                    btn
+                    btn-success
                     rounded-full
                     text-base
                     font-Inter
@@ -91,10 +89,8 @@ export default function shopLogin() {
                 <input
                   type="submit"
                   className="
-                    w-2/5
-                    h-[44px]
-                    bg-[#1EC067]
-                    text-black
+                    btn
+                    btn-success
                     rounded-full
                     text-base
                     font-Inter
