@@ -1,4 +1,3 @@
-// app/api/auth/check/route.ts
 import { getCurrentUser } from "@/lib/loginHelper";
 import { NextResponse } from "next/server";
 

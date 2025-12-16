@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import { put } from "@vercel/blob"
+import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   const formData = await request.formData();
@@ -13,7 +14,7 @@ export async function POST(request: Request) {
   });
 
   if (existingShop) {
-    return Response.json(
+    return NextResponse.json(
       { message: "อีเมลนี้มีการสมัครสมาชิกแล้ว!" },
       { status: 409 }
     );
@@ -55,14 +56,14 @@ export async function POST(request: Request) {
     });
     } catch (error: any) {
         if (error.code === "P2002") {
-            return Response.json(
+            return NextResponse.json(
                 { message: "อีเมลนี้มีการสมัครสมาชิกแล้ว!" },
                 { status: 409 }
             );
         }
     }
 
-    return Response.json(
+    return NextResponse.json(
         null,
         { status: 201 }
     );

@@ -11,7 +11,7 @@ export async function middleware(request: NextRequest) {
 
   // Define default dashboards for each role
   const dashboards = {
-    shop: "/shop/profile",
+    shop: "/shop",
     user: "/",
     admin: "/admin"
   };
