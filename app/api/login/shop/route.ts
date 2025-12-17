@@ -46,6 +46,13 @@ export async function POST(request: Request) {
     },
   });
 
+  await prisma.history.create({
+  data: {
+    shopId: shop.shopID,
+    login: new Date(),
+  },
+});
+
   const cookieStore = await cookies();
 
   // Set session cookie

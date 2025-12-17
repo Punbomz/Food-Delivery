@@ -42,6 +42,7 @@ model Shop {
   shopCloseTime String  @default("18:00")
   shopOpen      Boolean @default(false)
 
+  history  History[]
   sessions Session[]
 }
 
@@ -78,4 +79,13 @@ model Session {
   @@index([userId])
   @@index([shopId])
   @@index([adminId])
+}
+
+model History {
+  id        Int       @id @default(autoincrement())
+  shopID    Int
+  login     DateTime
+  logout    DateTime?
+
+  shop      Shop     @relation(fields: [shopID], references: [shopID])
 }
