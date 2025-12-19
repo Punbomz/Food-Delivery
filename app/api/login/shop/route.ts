@@ -46,12 +46,12 @@ export async function POST(request: Request) {
     },
   });
 
-  await prisma.history.create({
-  data: {
-    shopId: shop.shopID,
-    login: new Date(),
-  },
-});
+  await prisma.shopHistory.create({
+    data: {
+      shopID: shop.shopID,
+      shopLogin: new Date(),
+    },
+  });
 
   const cookieStore = await cookies();
 

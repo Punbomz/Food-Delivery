@@ -6,17 +6,27 @@ import { cookies } from "next/headers";
 export async function POST() {
   try {
     const cookieStore = await cookies();
-    const sessionToken = cookieStore.get("session")?.value;
+    const token = cookieStore.get("session")?.value;
 
-    if (!token) {
-      const session = await prisma.session.findUnique({
-        where: { token },
+    if (token) {
+      const session = await prisma.shopHistory.findFirst({
+        where: {
+          shopLogout: { equals: null },
+        },
+        orderBy: {
+          shopLogin: "desc",
+        },
       });
 
-      if (session) {  
-        await prisma.history.updateMany({
-          where: { shopId: session.shopId, logout: null },
-          data: { logout: new Date() },
+      if (session?.shopID) {
+        await prisma.shopHistory.updateMany({
+          where: {
+            shopID: session.shopID,
+            shopLogout: { equals: null },
+          },
+          data: {
+            shopLogout: new Date(),
+          },
         });
       }
     }
