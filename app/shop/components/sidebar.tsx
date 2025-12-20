@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import path from "path";
 
 export function Sidebar() {
     const pathname = usePathname();
@@ -10,7 +11,7 @@ export function Sidebar() {
                 <ul className="space-y-10 w-full">
                 <li><Link href="/shop/order" className={`rounded-box btn btn-ghost btn-block btn-lg w-full ${pathname === "/shop/order" ? "btn-active text-white btn-success" : "" }`}>คำสั่งซื้อ</Link></li>
                 <li><Link href="/shop/menu" className={`rounded-box btn btn-ghost btn-block btn-lg w-full ${pathname === "/shop/menu" ? "btn-active text-white btn-success" : "" }`}>รายการอาหาร</Link></li>
-                <li><Link href="/shop" className={`rounded-box btn btn-ghost btn-block btn-lg w-full ${pathname === "/shop" ? "btn-active text-white btn-success" : "" }`}>โปรไฟล์</Link></li>
+                <li><Link href="/shop" className={`rounded-box btn btn-ghost btn-block btn-lg w-full ${pathname === "/shop" || pathname === "/shop/history" ? "btn-active text-white btn-success" : "" }`}>โปรไฟล์</Link></li>
                 <li><Link href="/shop/report" className={`rounded-box btn btn-ghost btn-block btn-lg w-full ${pathname === "/shop/report" ? "btn-active text-white btn-success" : "" }`}>ยอดขาย</Link></li>
                 </ul>
             </div>
