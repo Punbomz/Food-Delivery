@@ -44,7 +44,7 @@ export default function shopLogin() {
         <div className="w-full h-25 flex justify-center">
           <img
             src="/RMUTK_Logo.png"
-            className="h-25 w-auto"
+            className="h-20 w-auto max-w-full"
             alt="RMUTK Logo"
           />
         </div>
