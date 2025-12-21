@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Sidebar  } from "../components/sidebar";
+import { Sidebar  } from "../../components/sidebar";
 
 interface User {
     shopID: number;

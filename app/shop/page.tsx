@@ -2,9 +2,12 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Sidebar } from "./components/sidebar"
+import { Sidebar } from "../components/sidebar"
 import { useRouter } from "next/navigation";
-import shopMenu from "./menu/page";
+import AlertModal from "../components/AlertModal";
+import { useAlertModal } from "../hooks/useAlertModal";
+import ConfirmModal from '../components/ConfirmModal';
+import { useConfirmModal } from "../hooks/useConfirmModal";
 
 interface User {
     shopID: number;
@@ -25,6 +28,18 @@ interface User {
 
 export default function shopProfile() {
   const router = useRouter();
+  const { isOpen, message, navigateTo, showAlert, closeAlert } = useAlertModal();
+
+  const { 
+        isOpen: isConfirmOpen, 
+        message: confirmMessage,
+        title: confirmTitle,
+        confirmText,
+        cancelText,
+        showConfirm, 
+        handleConfirm, 
+        handleCancel 
+    } = useConfirmModal();
   
   const [shopID, setID] = useState<number | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -130,42 +145,63 @@ export default function shopProfile() {
         setStatus(!status);
       }
     } catch(error) {
-      alert("ดำเนินการล้มเหลว! โปรดลองอีกครั้ง");
+      showAlert("ดำเนินการล้มเหลว! โปรดลองอีกครั้ง");
     }
     return;
   }
 
   async function handleEdit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setLoading(true);
-
+    
     const formData = new FormData(event.currentTarget);
     formData.append("id", shopID?.toString() || "");
     formData.append("oldEmail", user?.shopEmail || "");
 
-    const res = await fetch("/api/shop/edit", {
-      method: "POST",
-      body: formData,
-    });
+    showConfirm(
+      "ยืนยันการบันทึก?",
+      async () => {
+        setLoading(true);
 
-    if (res.status === 409) {
-      const data = await res.json();
-      alert(data.message);
-      setLoading(false);
-    } else if (res.ok) {
-      alert("บันทึกข้อมูลสำเร็จ!");
-      setEdit(false);
-      setLoading(false);
-      await getData();
-      window.location.reload();
-    } else {
-      alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล! กรุณาลองใหม่อีกครั้ง");
-      setLoading(false);
-    }
+        const res = await fetch("/api/shop/edit", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (res.status === 409) {
+          const data = await res.json();
+          showAlert(data.message);
+          setLoading(false);
+        } else if (res.ok) {
+          setEdit(false);
+          setLoading(false);
+          await getData();
+          showAlert("บันทึกข้อมูลสำเร็จ!", "/shop");
+        } else {
+          showAlert("เกิดข้อผิดพลาดในการบันทึกข้อมูล! กรุณาลองใหม่อีกครั้ง");
+          setLoading(false);
+        }
+      }
+    );
   }
 
   return (
     <>
+      <AlertModal
+        isOpen={isOpen}
+        message={message}
+        navigateTo={navigateTo}
+        onClose={closeAlert}
+      />
+
+      <ConfirmModal
+          isOpen={isConfirmOpen}
+          title={confirmTitle}
+          message={confirmMessage}
+          confirmText={confirmText}
+          cancelText={cancelText}
+          onConfirm={handleConfirm}
+          onCancel={handleCancel}
+      />
     
       <div className="p-15">
       <div className="flex gap-10 justify-center text-2xl">
