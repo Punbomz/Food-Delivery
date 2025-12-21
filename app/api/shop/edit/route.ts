@@ -1,34 +1,61 @@
 import { prisma } from "@/lib/prisma";
-import bcrypt from "bcrypt";
 import { put, del } from "@vercel/blob"
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   const formData = await request.formData();
 
-  const email = formData.get("Email") as string;
+  const data: any = {
+    shopName: formData.get("Name") as string,
+    shopLocation: formData.get("Location") as string,
+    shopFname: formData.get("Fname") as string,
+    shopLname: formData.get("Lname") as string,
+    shopEmail: formData.get("Email") as string,
+    shopPhone: formData.get("Phone") as string,
+    shopOpenTime: formData.get("Open") as string,
+    shopCloseTime: formData.get("Close") as string,
+  };
 
-  // Check email
-  const existingShop = await prisma.shop.findUnique({
-    where: { shopEmail: email },
+  const shopId = Number(formData.get("id"));
+
+  const oldEmail = formData.get("oldEmail");
+  if (data.shopEmail !== oldEmail) {
+    // Check email
+    const existingShop = await prisma.shop.findUnique({
+      where: { shopEmail: data.shopEmail },
+    });
+  
+    if (existingShop) {
+      return NextResponse.json(
+        { message: "อีเมลนี้มีการสมัครสมาชิกแล้ว!" },
+        { status: 409 }
+      );
+    }
+  }
+
+  let oldPic: string | null = null;
+  let oldQR: string | null = null;
+  const old = await prisma.shop.findUnique({
+    where: { shopID: shopId },
   });
 
-  if (existingShop) {
+  if (!old) {
     return NextResponse.json(
-      { message: "อีเมลนี้มีการสมัครสมาชิกแล้ว!" },
-      { status: 409 }
+      { message: "ไม่พบร้านค้า" },
+      { status: 404 }
     );
   }
 
-  // Encrypt password
-  const password = formData.get("Pass") as string;
-  const hashedPassword = await bcrypt.hash(password, 10);
+  oldPic = old.shopPic;
+  oldQR = old.shopQR;
 
   // Profil Pic
   const picFile = formData.get("Pic") as File | null;
   let profileUrl = "";
   let shopPic: string | null = null;
   if (picFile && picFile.size > 0) {
+    if(oldPic) del(oldPic);
+
     const fileExtension = picFile.name.substring(picFile.name.lastIndexOf('.'));
     const fileNameWithoutExt = picFile.name.substring(0, picFile.name.lastIndexOf('.'));
     
@@ -52,6 +79,7 @@ export async function POST(request: Request) {
   let qrUrl = "";
   let qrPic: string | null = null;
   if (qrFile && qrFile.size > 0) {
+    if(oldQR) del(oldQR);
     const fileExtension = qrFile.name.substring(qrFile.name.lastIndexOf('.'));
     const fileNameWithoutExt = qrFile.name.substring(0, qrFile.name.lastIndexOf('.'));
     
@@ -71,28 +99,24 @@ export async function POST(request: Request) {
     }
   }
 
+  if (profileUrl && profileUrl !== "") {
+    data.shopPic = profileUrl;
+  }
+
+  if (qrUrl && qrUrl !== "") {
+    data.shopQR = qrUrl;
+  }
+
   try {
-    await prisma.shop.create({
-        data: {
-        shopPic: profileUrl,
-        shopQR: qrUrl,
-        shopName: formData.get("Name") as string,
-        shopLocation: formData.get("Location") as string,
-        shopFname: formData.get("Fname") as string,
-        shopLname: formData.get("Lname") as string,
-        shopGender: formData.get("Gender") as string,
-        shopEmail: formData.get("Email") as string,
-        shopPhone: formData.get("Phone") as string,
-        shopPass: hashedPassword,
-        },
+    await prisma.shop.update({
+      where: { shopID: shopId },
+      data,
     });
-    } catch (error: any) {
-        if (error.code === "P2002") {
-            return NextResponse.json(
-                { message: "อีเมลนี้มีการสมัครสมาชิกแล้ว!" },
-                { status: 409 }
-            );
-        }
+    } catch (error) {
+        return NextResponse.json(
+            { message: "อีเมลนี้มีการสมัครสมาชิกแล้ว!" },
+            { status: 409 }
+        );
     }
 
     return NextResponse.json(

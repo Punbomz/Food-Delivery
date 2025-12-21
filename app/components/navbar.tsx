@@ -3,6 +3,10 @@
 import Link from 'next/link';
 import { useState, useEffect } from "react";
 import { usePathname } from 'next/navigation';
+import AlertModal from "../components/AlertModal";
+import { useAlertModal } from "../hooks/useAlertModal";
+import ConfirmModal from './ConfirmModal';
+import { useConfirmModal } from "../hooks/useConfirmModal";
 
 interface User {
     name: string;
@@ -12,6 +16,19 @@ interface User {
 }
 
 export function Navbar() {
+    const { isOpen, message, navigateTo, showAlert, closeAlert } = useAlertModal();
+
+    const { 
+        isOpen: isConfirmOpen, 
+        message: confirmMessage,
+        title: confirmTitle,
+        confirmText,
+        cancelText,
+        showConfirm, 
+        handleConfirm, 
+        handleCancel 
+    } = useConfirmModal();
+
     const [user, setUser] = useState<User | null>(null);
     const [role, setRole] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
@@ -39,26 +56,55 @@ export function Navbar() {
     };
 
     const handleLogout = async () => {
-        if (!confirm("ยืนยันการออกจากระบบ?")) {
-            return;
-        }
-        try {
-        const res = await fetch("/api/logout", {
-            method: "POST",
-            credentials: "include",
-        });
+        showConfirm(
+        "ยืนยันการออกจากระบบ?",
+        async () => {
+            setLoading(true);
+            try {
+            const res = await fetch("/api/logout", {
+                method: "POST",
+                credentials: "include",
+            });
 
-        if (res.ok) {
-            alert("ออกจากระบบสำเร็จ!");
-            setUser(null);
-            window.location.href = "/";
+            if (res.ok) {
+                setUser(null);
+                showAlert("ออกจากระบบสำเร็จ!", "/");
+            }
+            } catch (error) {
+            console.error("Logout failed:", error);
+            showAlert("เกิดข้อผิดพลาดในการออกจากระบบ");
+            }
+
+            setLoading(false);
+        },
+        {
+            title: "ออกจากระบบ",
+            confirmText: "ยืนยัน",
+            cancelText: "ยกเลิก"
         }
-        } catch (error) {
-        console.error("Logout failed:", error);
-        }
+        );
     };
 
     return (
+        <>
+        
+        <AlertModal
+            isOpen={isOpen}
+            message={message}
+            navigateTo={navigateTo}
+            onClose={closeAlert}
+        />
+
+        <ConfirmModal
+            isOpen={isConfirmOpen}
+            title={confirmTitle}
+            message={confirmMessage}
+            confirmText={confirmText}
+            cancelText={cancelText}
+            onConfirm={handleConfirm}
+            onCancel={handleCancel}
+        />
+        
         <div className="drawer fixed top-0 z-50 lg:drawer-open">
             <input id="my-drawer-2" type="checkbox" className="drawer-toggle lg:hidden" />
             <div className="drawer-content flex flex-col">
@@ -211,11 +257,19 @@ export function Navbar() {
                     )}
                     { user ? (
                         <li>
-                            <div onClick={handleLogout} className={`btn btn-ghost w-full flex items-center justify-start gap-3 text-left`}>
-                            <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="httwww.w3.org/2000/svg">
-                                <path d="M11.2083 21.4167L18.5 14.125M18.5 14.125L11.2083 6.83333M18.5 14.125H1M18.5 1H24.3333C25.1069 1 25.8487 1.30729 26.3957 1.85427C26.9427 2.40125 27.25 3.14312 27.25 3.91667V24.3333C27.25 25.1069 26.9427 25.8487 26.3957 26.3957C25.8487 26.9427 25.1069 27.25 24.3333 27.25H18.5" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                            Logout</div>
+                            { !loading ? (
+                                <div onClick={handleLogout} className={`btn btn-ghost w-full flex items-center justify-start gap-3 text-left`}>
+                                <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="httwww.w3.org/2000/svg">
+                                    <path d="M11.2083 21.4167L18.5 14.125M18.5 14.125L11.2083 6.83333M18.5 14.125H1M18.5 1H24.3333C25.1069 1 25.8487 1.30729 26.3957 1.85427C26.9427 2.40125 27.25 3.14312 27.25 3.91667V24.3333C27.25 25.1069 26.9427 25.8487 26.3957 26.3957C25.8487 26.9427 25.1069 27.25 24.3333 27.25H18.5" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                                Logout</div>
+                            ) : (
+                                <div className={`btn btn-ghost w-full flex items-center justify-start gap-3 text-left`}>
+                                <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="httwww.w3.org/2000/svg">
+                                    <path d="M11.2083 21.4167L18.5 14.125M18.5 14.125L11.2083 6.83333M18.5 14.125H1M18.5 1H24.3333C25.1069 1 25.8487 1.30729 26.3957 1.85427C26.9427 2.40125 27.25 3.14312 27.25 3.91667V24.3333C27.25 25.1069 26.9427 25.8487 26.3957 26.3957C25.8487 26.9427 25.1069 27.25 24.3333 27.25H18.5" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                                <span className="loading loading-spinner loading-sm"></span></div>
+                            )}
                         </li>
                     ) : (
                         <li>
@@ -229,5 +283,6 @@ export function Navbar() {
                 </ul>
             </div>
         </div>
+        </>
     )
 }
