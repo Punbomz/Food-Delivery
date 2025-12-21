@@ -48,10 +48,7 @@ export default function shopRegister() {
     if (res.status === 409) {
       const data = await res.json();
       alert(data.message);
-      return;
-    }
-
-    if (res.ok) {
+    } else if (res.ok) {
       alert("สมัครสมาชิกสำเร็จ!");
       router.replace("/shop/login");
     } else {

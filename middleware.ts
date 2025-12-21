@@ -87,6 +87,9 @@ export const config = {
     "/admin/:path*", 
     "/customer/:path*", 
     "/login/:path*", 
-    "/register/:path*"
+    "/register/:path*",
+    "/login/shop",
+    "/login/admin",
+    "/login/customer"
   ],
 };
