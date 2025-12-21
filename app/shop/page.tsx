@@ -9,6 +9,7 @@ import { useAlertModal } from "../hooks/useAlertModal";
 import ConfirmModal from '../components/ConfirmModal';
 import { useConfirmModal } from "../hooks/useConfirmModal";
 import Skeleton from "../components/Skeleton";
+import ResetPasswordModal from "../components/ResetPasswordModal";
 
 interface User {
     shopID: number;
@@ -30,6 +31,7 @@ interface User {
 export default function shopProfile() {
   const router = useRouter();
   const { isOpen, message, navigateTo, showAlert, closeAlert } = useAlertModal();
+  const [isResetPasswordOpen, setResetPasswordOpen] = useState(false);
 
   const { 
         isOpen: isConfirmOpen, 
@@ -205,6 +207,13 @@ export default function shopProfile() {
           onConfirm={handleConfirm}
           onCancel={handleCancel}
       />
+
+      <ResetPasswordModal
+        isOpen={isResetPasswordOpen}
+        onClose={() => setResetPasswordOpen(false)}
+        shopID={shopID}
+        onAlert={showAlert}
+      />
     
       <div className="p-15">
       <div className="flex gap-10 justify-center text-2xl">
@@ -291,8 +300,14 @@ export default function shopProfile() {
                       </div>
                     )}
                     <div className="mt-10 items-center justify-center">
-                      <Link href="shop/changepass" className="mt-2 flex items-center justify-center underline text-lg">แก้ไขรหัสผ่าน</Link>
-                      <Link href="shop/history" className="mt-2 flex items-center justify-center underline text-lg">ประวัติการใช้งาน</Link>
+                      <button
+                        type="button"
+                        onClick={() => setResetPasswordOpen(true)}
+                        className="mt-3 flex items-center justify-center btn btn-error text-lg w-full"
+                      >
+                        แก้ไขรหัสผ่าน
+                      </button>
+                      <Link href="shop/history" className="mt-3 flex items-center justify-center btn btn-warning text-lg">ประวัติการใช้งาน</Link>
                     </div>
                     <div className="mt-10 flex items-center justify-center gap-2">
                       <i className='far'>&#xf017;</i>

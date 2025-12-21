@@ -112,12 +112,12 @@ export async function POST(request: Request) {
       where: { shopID: shopId },
       data,
     });
-    } catch (error) {
-        return NextResponse.json(
-            { message: "อีเมลนี้มีการสมัครสมาชิกแล้ว!" },
-            { status: 409 }
-        );
-    }
+  } catch (error) {
+      return NextResponse.json(
+          { message: "อีเมลนี้มีการสมัครสมาชิกแล้ว!" },
+          { status: 409 }
+      );
+  }
 
     return NextResponse.json(
         null,
