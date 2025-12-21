@@ -176,19 +176,12 @@ export function Navbar() {
                                     <span className="loading loading-spinner loading-sm"></span>
                                 </li>
                                 ) : user ? (
-                                <li className="btn btn-error rounded-full w-20">
-                                    <div
-                                    onClick={handleLogout}
-                                    className="flex justify-center cursor-pointer"
-                                    >
+                                <li className="btn btn-error rounded-full w-20" onClick={handleLogout}>
                                     Logout
-                                    </div>
                                 </li>
                                 ) : (
-                                <li className="btn bg-[#ADF38D] rounded-full w-20">
-                                    <Link href="/customer/login" className="flex justify-center">
+                                <li className="btn btn-accent rounded-full w-20" onClick={() => window.location.href = "/login/customer"}>
                                     Login
-                                    </Link>
                                 </li>
                             )}
                         </ul>
