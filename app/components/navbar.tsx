@@ -196,7 +196,7 @@ export function Navbar() {
                 </div>
             </div>
 
-            <div className="drawer-side lg:hidden">
+            <div className="drawer-side lg:hidden h-full">
                 <label htmlFor="my-drawer-2" aria-label="close sidebar" className="drawer-overlay"></label>
                 <ul className="menu bg-base-200 min-h-full w-80 p-4 gap-5">
                 {/* Sidebar */}
