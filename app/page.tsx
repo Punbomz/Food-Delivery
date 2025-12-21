@@ -212,12 +212,12 @@ export default function TestPage() {
         <div className="block lg:hidden justify-center items-center">
           {cafeterias === "" &&
             <div className="justify-center text-center">
-              <div className="bg-green-500 rounded-box p-5 text-white">
+              <div className="bg-green-500 rounded-box p-5 text-white mx-auto">
                 <h1 className="text-2xl font-bold m-3">🥗 วันนี้กินอะไรดี</h1>
                 <h2 className="m-3">🍜 เลือกร้านอาหารที่อยากสั่งได้เลย!</h2>
               </div>
               
-              <div className="card bg-base-100 w-96 shadow-lg justify-center items-center mx-auto mt-5 hover:scale-105 transition-transform duration-300">
+              <div className="card bg-base-100 w-96 shadow-lg justify-center items-center mx-auto mt-5 hover:scale-105 transition-transform duration-300 mx-auto">
                 <figure className="px-10 pt-10">
                   <img
                     src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
@@ -239,7 +239,7 @@ export default function TestPage() {
                 </div>
               </div>
 
-              <div className="card bg-base-100 w-96 shadow-lg justify-center items-center mx-auto mt-5 hover:scale-105 transition-transform duration-300">
+              <div className="card bg-base-100 w-96 shadow-lg justify-center items-center mx-auto mt-5 hover:scale-105 transition-transform duration-300 mx-auto">
                 <figure className="px-10 pt-10">
                   <img
                     src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
