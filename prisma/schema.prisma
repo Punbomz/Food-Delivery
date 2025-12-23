@@ -58,6 +58,18 @@ model Admin {
   sessions Session[]
 }
 
+model Customer {
+  customerID    Int     @id @default(autoincrement())
+  customerFname String
+  customerLname String
+  customerEmail String  @unique
+  customerPhone String
+  customerPass  String
+  customerPic   String?
+
+  sessions Session[]
+}
+
 model Session {
   id        String   @id @default(cuid())
   token     String   @unique
@@ -75,10 +87,14 @@ model Session {
   adminId   Int?
   admin     Admin?   @relation(fields: [adminId], references: [adminID], onDelete: Cascade)
 
+  customerId   Int?
+  customer     Customer?   @relation(fields: [customerId], references: [customerID], onDelete: Cascade)
+
   @@index([token])
   @@index([userId])
   @@index([shopId])
   @@index([adminId])
+  @@index([customerId])
 }
 
 model ShopHistory {
