@@ -44,6 +44,8 @@ model Shop {
 
   history  ShopHistory[]
   sessions Session[]
+  foods    Food[]
+  foodgenre FoodGenre[]
 }
 
 model Admin {
@@ -64,14 +66,12 @@ model Session {
   expiresAt DateTime
   createdAt DateTime @default(now())
   
-  // Make userId optional and add shopId
   userId    Int?
   user      User?    @relation(fields: [userId], references: [userID], onDelete: Cascade)
   
   shopId    Int?
   shop      Shop?    @relation(fields: [shopId], references: [shopID], onDelete: Cascade)
   
-  // Add adminId if you have admins
   adminId   Int?
   admin     Admin?   @relation(fields: [adminId], references: [adminID], onDelete: Cascade)
 
@@ -88,4 +88,47 @@ model ShopHistory {
   shopLogout    DateTime?
 
   shop      Shop     @relation(fields: [shopID], references: [shopID])
+}
+
+model Food {
+  foodID  Int @id @default(autoincrement())
+  shopID  Int
+  foodName  String
+  foodDetails String
+  foodPrice Float
+  foodPic String
+  foodGenreID Int
+  foodStatus Boolean @default(true)
+
+  shop  Shop  @relation(fields: [shopID], references: [shopID])
+
+  optionGroup OptionGroup[]
+}
+
+model FoodGenre {
+  fGenreID Int @id @default(autoincrement())
+  fGenreName String
+  shopID  Int
+
+  shop  Shop  @relation(fields: [shopID], references: [shopID])
+}
+
+model OptionGroup {
+  ogID  Int @id @default(autoincrement())
+  foodID  Int
+  ogName  String
+  ogMultiple  Boolean
+
+  food Food @relation(fields: [foodID], references: [foodID])
+
+  option Option[]
+}
+
+model Option {
+  opID  Int @id @default(autoincrement())
+  ogID  Int
+  opName  String
+  opPrice Float
+
+  optionGroup OptionGroup @relation(fields: [ogID], references: [ogID])
 }
