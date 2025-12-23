@@ -9,8 +9,8 @@ export async function POST(request: Request) {
   const Pass = formData.get("Pass") as string;
   const Remember = formData.get("Remember") === "on";
 
-  const customer = await prisma.customer.findUnique({
-    where: { customerEmail: Email },
+  const customer = await prisma.user.findUnique({
+    where: { userEmail: Email },
   });
 
   if (!customer) {
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
   }
 
   // Compare Password
-  const isMatch = await bcrypt.compare(Pass, customer.customerPass);
+  const isMatch = await bcrypt.compare(Pass, customer.userPass);
 
   if (!isMatch) {
     return Response.json(
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
   await prisma.session.create({
     data: {
       token,
-      customerId: customer.customerID,
+      userId: customer.userID,
       expiresAt,
     },
   });
