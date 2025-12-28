@@ -71,8 +71,7 @@ export function Navbar() {
                 showAlert("ออกจากระบบสำเร็จ!", "/");
             }
             } catch (error) {
-            console.error("Logout failed:", error);
-            showAlert("เกิดข้อผิดพลาดในการออกจากระบบ");
+            showAlert("เกิดข้อผิดพลาดในการออกจากระบบ!");
             }
 
             setLoading(false);

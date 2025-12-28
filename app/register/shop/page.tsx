@@ -97,7 +97,7 @@ export default function shopRegister() {
                   {profilePreview && (
                     <div className="avatar m-3">
                       <div className="ring-primary ring-offset-base-100 w-24 rounded-full ring-2 ring-offset-2">
-                        <img src={profilePreview} alt="prfile"/>
+                        <img src={profilePreview} alt="profile"/>
                       </div>
                     </div>
                   )}

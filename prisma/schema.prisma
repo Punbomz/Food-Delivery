@@ -46,6 +46,7 @@ model Shop {
   sessions Session[]
   foods    Food[]
   foodgenre FoodGenre[]
+  optiongroup OptionGroup[]
 }
 
 model Admin {
@@ -114,11 +115,10 @@ model Food {
   foodPrice Float
   foodPic String
   foodGenreID Int
+  foodOptions Int[]
   foodStatus Boolean @default(true)
 
   shop  Shop  @relation(fields: [shopID], references: [shopID])
-
-  optionGroup OptionGroup[]
 }
 
 model FoodGenre {
@@ -131,13 +131,14 @@ model FoodGenre {
 
 model OptionGroup {
   ogID  Int @id @default(autoincrement())
-  foodID  Int
   ogName  String
   ogMultiple  Boolean
-
-  food Food @relation(fields: [foodID], references: [foodID])
+  ogForce Boolean
+  shopID Int
 
   option Option[]
+
+  shop  Shop  @relation(fields: [shopID], references: [shopID])
 }
 
 model Option {
