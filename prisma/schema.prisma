@@ -48,6 +48,7 @@ model Shop {
 
 model Admin {
   adminID    Int     @id @default(autoincrement())
+  adminUsername String  @unique
   adminFname String
   adminLname String
   adminEmail String  @unique
