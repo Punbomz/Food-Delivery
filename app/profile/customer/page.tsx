@@ -37,8 +37,8 @@ export default function ProfilePage() {
   if (!profile) return null;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-base-200">
-      <div className="w-full max-w-sm bg-base-100 border border-base-300 rounded-box shadow-lg p-8">
+    <div className="min-h-screen flex items-center justify-center bg-base-100">
+      <div className="w-full max-w-sm bg-base-200 border border-base-300 rounded-box shadow-lg p-8">
         <div className="flex flex-col items-center gap-5">
           
           {/* Profile Image */}
@@ -71,10 +71,15 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Footer Links */}
-              <div className="flex justify-center gap-5 text-sm p-5 w-xs mx-auto">
-                <p>แก้ไขข้อมูล</p>
-              </div>
+          {/* Footer */}
+          <div className="flex justify-center gap-6 text-sm mt-8">
+            <Link
+              href="/editProfile/customer"
+              className="underline text-black hover:text-gray-600"
+            >
+              แก้ไขข้อมูล
+            </Link>
+          </div>
         </div>
       </div>
     </div>
