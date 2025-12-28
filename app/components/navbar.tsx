@@ -7,6 +7,7 @@ import AlertModal from "../components/AlertModal";
 import { useAlertModal } from "../hooks/useAlertModal";
 import ConfirmModal from './ConfirmModal';
 import { useConfirmModal } from "../hooks/useConfirmModal";
+import { title } from 'process';
 
 interface User {
     name: string;
@@ -76,6 +77,7 @@ export function Navbar() {
 
             setLoading(false);
         },
+            undefined,
         {
             title: "ออกจากระบบ",
             confirmText: "ยืนยัน",
