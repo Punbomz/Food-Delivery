@@ -156,7 +156,7 @@ export default function ShopProfilePage() {
           {/* Footer */}
           <div className="flex justify-between text-sm p-5 w-xs mx-auto">
             <Link
-              href="/history/shop"
+              href="/shop/history"
               className="underline text-black hover:text-gray-600">
               ประวัติการใช้งาน
             </Link>
