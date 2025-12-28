@@ -6,11 +6,16 @@ export const useConfirmModal = () => {
   const [title, setTitle] = useState("ยืนยัน");
   const [confirmText, setConfirmText] = useState("ตกลง");
   const [cancelText, setCancelText] = useState("ยกเลิก");
-  const [onConfirmCallback, setOnConfirmCallback] = useState<(() => void) | null>(null);
+
+  const [onConfirmCallback, setOnConfirmCallback] =
+    useState<(() => void) | null>(null);
+  const [onCancelCallback, setOnCancelCallback] =
+    useState<(() => void) | null>(null);
 
   const showConfirm = (
-    msg: string, 
+    msg: string,
     onConfirm: () => void,
+    onCancel?: () => void,
     options?: {
       title?: string;
       confirmText?: string;
@@ -21,19 +26,20 @@ export const useConfirmModal = () => {
     setTitle(options?.title || "ยืนยัน");
     setConfirmText(options?.confirmText || "ตกลง");
     setCancelText(options?.cancelText || "ยกเลิก");
+
     setOnConfirmCallback(() => onConfirm);
+    setOnCancelCallback(() => onCancel || null);
     setIsOpen(true);
   };
 
   const handleConfirm = () => {
     setIsOpen(false);
-    if (onConfirmCallback) {
-      onConfirmCallback();
-    }
+    onConfirmCallback?.();
   };
 
   const handleCancel = () => {
     setIsOpen(false);
+    onCancelCallback?.();
   };
 
   return {

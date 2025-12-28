@@ -55,7 +55,7 @@ export default function shopProfile() {
   const [loadingPage, setLoadingPage] = useState(true);
 
   useEffect(() => {
-      checkAuth();
+    checkAuth();
   }, []);
 
   useEffect(() => {
@@ -215,13 +215,13 @@ export default function shopProfile() {
         onAlert={showAlert}
       />
     
-      <div className="p-15">
+      <div className="p-10">
       <div className="flex gap-10 justify-center text-2xl">
       {/* Side Bar */}
           < Sidebar />
           
       {/* Content */}
-          <div className="flex-3/4 shadow-lg rounded-box p-20 bg-white justify-center">
+          <div className="flex-3/4 shadow-lg rounded-box p-5 lg:p-10 bg-white justify-center">
           { loadingPage ? (
             <Skeleton />
           ) : (  

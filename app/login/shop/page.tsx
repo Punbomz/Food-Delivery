@@ -58,7 +58,7 @@ export default function shopLogin() {
               <fieldset className="fieldset bg-base-200 border-base-300 rounded-box md:w-xl sm:w-2xl border p-10 shadow-md">
               
               <h1 className="text-2xl font-Inter text-black mx-auto text-center">
-                เข้าสู่ระบบ
+                เข้าสู่ระบบร้านค้า
               </h1>
 
               <div className="space-y-2 w-xs mx-auto">
