@@ -14,7 +14,7 @@ export async function GET() {
   }
 
   const customer = await prisma.customer.findUnique({
-    where: { customerId: Number(customerId) },
+    where: { customerID: Number(customerId) },
     select: {
       customerPic: true,
       customerFname: true,
