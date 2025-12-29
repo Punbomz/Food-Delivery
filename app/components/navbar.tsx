@@ -8,6 +8,7 @@ import { useAlertModal } from "../hooks/useAlertModal";
 import ConfirmModal from './ConfirmModal';
 import { useConfirmModal } from "../hooks/useConfirmModal";
 import { title } from 'process';
+import { Suspense } from "react";
 import dynamic from "next/dynamic";
 
 interface User {
@@ -145,7 +146,9 @@ export function Navbar() {
                         )}
 
                         { !user && (
-                            <NavbarSearch />
+                            <Suspense fallback={null}>
+                                <NavbarSearch />
+                            </Suspense>
                         )}
                         { user && role === "shop" && (
                             <>
@@ -161,7 +164,9 @@ export function Navbar() {
                         )}
                         { user && role === "customer" && (
                             <>
-                                <NavbarSearch />
+                                <Suspense fallback={null}>
+                                    <NavbarSearch />
+                                </Suspense>
 
                                 <Link href="/customer/cart" className='hidden lg:block'>
                                     <i className='fas text-xl'>&#xf07a;</i>
