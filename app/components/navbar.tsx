@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from "react";
-import { usePathname, useRouter, useSearchParams  } from 'next/navigation';
+import { usePathname, useRouter  } from 'next/navigation';
 import AlertModal from "../components/AlertModal";
 import { useAlertModal } from "../hooks/useAlertModal";
 import ConfirmModal from './ConfirmModal';
 import { useConfirmModal } from "../hooks/useConfirmModal";
 import { title } from 'process';
+import dynamic from "next/dynamic";
 
 interface User {
     name: string;
@@ -19,9 +20,9 @@ interface User {
 export function Navbar() {
     const { isOpen, message, navigateTo, showAlert, closeAlert } = useAlertModal();
     const router = useRouter();
-    const searchParams = useSearchParams();
-
-    const query = searchParams.get("srch") ?? "";
+    const NavbarSearch = dynamic(() => import("./NavbarSearch"), {
+        ssr: false,
+    });
 
     const { 
         isOpen: isConfirmOpen, 
@@ -42,19 +43,6 @@ export function Navbar() {
     useEffect(() => {
         checkAuth();
     }, []);
-
-    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        const params = new URLSearchParams(searchParams.toString());
-
-        if (value) {
-            params.set("srch", value);
-        } else {
-            params.delete("srch");
-        }
-
-        router.push(`?${params.toString()}`);
-    };
 
     const checkAuth = async () => {
         try {
@@ -157,30 +145,7 @@ export function Navbar() {
                         )}
 
                         { !user && (
-                            <>
-                                <label className="hidden sm:flex input items-center gap-2 flex-none">
-                                    <svg
-                                    className="h-[1em] opacity-50"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 24 24"
-                                    >
-                                    <g
-                                        strokeLinejoin="round"
-                                        strokeLinecap="round"
-                                        strokeWidth="2.5"
-                                        fill="none"
-                                        stroke="currentColor"
-                                    >
-                                        <circle cx="11" cy="11" r="8"></circle>
-                                        <path d="m21 21-4.3-4.3"></path>
-                                    </g>
-                                    </svg>
-
-                                    <input type="search" required placeholder="Search"
-                                        value={query}
-                                        onChange={handleSearch}/>
-                                </label>
-                            </>
+                            <NavbarSearch />
                         )}
                         { user && role === "shop" && (
                             <>
@@ -196,34 +161,13 @@ export function Navbar() {
                         )}
                         { user && role === "customer" && (
                             <>
-                                <label className="hidden sm:flex input items-center gap-2 flex-none">
-                                    <svg
-                                    className="h-[1em] opacity-50"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 24 24"
-                                    >
-                                    <g
-                                        strokeLinejoin="round"
-                                        strokeLinecap="round"
-                                        strokeWidth="2.5"
-                                        fill="none"
-                                        stroke="currentColor"
-                                    >
-                                        <circle cx="11" cy="11" r="8"></circle>
-                                        <path d="m21 21-4.3-4.3"></path>
-                                    </g>
-                                    </svg>
-
-                                    <input type="search" required placeholder="Search"
-                                        value={query}
-                                        onChange={handleSearch}/>
-                                </label>
+                                <NavbarSearch />
 
                                 <Link href="/customer/cart" className='hidden lg:block'>
                                     <i className='fas text-xl'>&#xf07a;</i>
                                 </Link>
 
-                                <Link href="/customer/cart" className='fixed right-10 lg:hidden'>
+                                <Link href="/customer/cart" className='absolute right-4 lg:hidden'>
                                     <i className='fas text-xl'>&#xf07a;</i>
                                 </Link>
                             </>
