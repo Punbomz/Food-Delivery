@@ -7,6 +7,7 @@ export async function POST(request: Request) {
 
   const data: any = {
     shopName: formData.get("Name") as string,
+    shopDetail: formData.get("Detail") as string,
     shopLocation: formData.get("Location") as string,
     shopFname: formData.get("Fname") as string,
     shopLname: formData.get("Lname") as string,
