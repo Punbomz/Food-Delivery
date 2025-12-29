@@ -1,14 +1,8 @@
 // middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { clearSession } from "@/lib/loginHelper";
 
 export async function middleware(request: NextRequest) {
-
-  const res = await fetch('api/auth/check');
-  if(!res.ok) {
-    await clearSession();
-  }
 
   const { pathname } = request.nextUrl;
   
@@ -41,9 +35,19 @@ export async function middleware(request: NextRequest) {
       return NextResponse.next();
     }
     if (isProtectedRoute) {
-      return NextResponse.redirect(new URL("/", request.url));
+      const res = NextResponse.redirect(new URL("/", request.url));
+      res.cookies.delete("session");
+      res.cookies.delete("role");
+      return res;
     }
     return NextResponse.next();
+  }
+
+  if (token && !role) {
+    const res = NextResponse.redirect(new URL("/", request.url));
+    res.cookies.delete("session");
+    res.cookies.delete("role");
+    return res;
   }
 
   // Has session - redirect to appropriate dashboard
