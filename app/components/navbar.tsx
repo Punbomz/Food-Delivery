@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from "react";
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams  } from 'next/navigation';
 import AlertModal from "../components/AlertModal";
 import { useAlertModal } from "../hooks/useAlertModal";
 import ConfirmModal from './ConfirmModal';
@@ -19,6 +19,9 @@ interface User {
 export function Navbar() {
     const { isOpen, message, navigateTo, showAlert, closeAlert } = useAlertModal();
     const router = useRouter();
+    const searchParams = useSearchParams();
+
+    const query = searchParams.get("srch") ?? "";
 
     const { 
         isOpen: isConfirmOpen, 
@@ -39,6 +42,19 @@ export function Navbar() {
     useEffect(() => {
         checkAuth();
     }, []);
+
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        const params = new URLSearchParams(searchParams.toString());
+
+        if (value) {
+            params.set("srch", value);
+        } else {
+            params.delete("srch");
+        }
+
+        router.push(`?${params.toString()}`);
+    };
 
     const checkAuth = async () => {
         try {
@@ -160,7 +176,9 @@ export function Navbar() {
                                     </g>
                                     </svg>
 
-                                    <input type="search" required placeholder="Search" />
+                                    <input type="search" required placeholder="Search"
+                                        value={query}
+                                        onChange={handleSearch}/>
                                 </label>
                             </>
                         )}
@@ -196,7 +214,9 @@ export function Navbar() {
                                     </g>
                                     </svg>
 
-                                    <input type="search" required placeholder="Search" />
+                                    <input type="search" required placeholder="Search"
+                                        value={query}
+                                        onChange={handleSearch}/>
                                 </label>
 
                                 <Link href="/customer/cart" className='hidden lg:block'>

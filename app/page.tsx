@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Skeleton2 from "./components/Skeleton2";
 import AlertModal from "@/app/components/AlertModal";
 import { useAlertModal } from "@/app/hooks/useAlertModal";
+import { useSearchParams, useRouter } from "next/navigation";
 
 interface Shop {
   shopID: number;
@@ -23,6 +24,10 @@ export default function TestPage() {
   const scrollRef2 = useRef<HTMLDivElement>(null);
   const [loadingPage, setLoadingPage] = useState(true);
   const { isOpen, message, navigateTo, showAlert, closeAlert } = useAlertModal();
+
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const query = searchParams.get("srch")?.toLowerCase() || "";
 
   const [shops, setShop] = useState<Shop[]>([]);
 
@@ -87,8 +92,29 @@ export default function TestPage() {
     }
   }
 
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        const params = new URLSearchParams(searchParams.toString());
+
+        if (value) {
+            params.set("srch", value);
+        } else {
+            params.delete("srch");
+        }
+
+        router.push(`?${params.toString()}`);
+    };
+
   const shop1 = shops.filter((shop: Shop) => shop.shopLocation === "ตึก 80");
+  const filteredShop1 = shop1.filter((shop: Shop) =>
+    shop.shopName.toLowerCase().includes(query) ||
+    shop.shopDetail?.toLowerCase().includes(query)
+  );
   const shop2 = shops.filter((shop: Shop) => shop.shopLocation === "บพิตรพิมุข");
+  const filteredShop2 = shop2.filter((shop: Shop) =>
+    shop.shopName.toLowerCase().includes(query) ||
+    shop.shopDetail?.toLowerCase().includes(query)
+  );
 
   return (
     <>
@@ -120,12 +146,12 @@ export default function TestPage() {
                   >
                     
                     {/* Card */}
-                    { shop1.length === 0 ? (
+                    { filteredShop1.length === 0 ? (
                       <div className="w-full rounded-box items-center bg-[#EDEDEDF0] flex justify-center p-10 text-black mb-5">
                         <h1 className="text-sm lg:text-lg">ยังไม่มีร้านอาหาร</h1>
                       </div>
                     ) : (
-                      shop1.map((shop: Shop) => (
+                      filteredShop1.map((shop: Shop) => (
                           <div key={shop.shopID} className="card bg-base-300 w-64 flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-300 hover:cursor-pointer">
                             <figure>
                               <img
@@ -168,12 +194,12 @@ export default function TestPage() {
                   >
                     
                     {/* Card */}
-                    { shop2.length === 0 ? (
+                    { filteredShop2.length === 0 ? (
                       <div className="w-full rounded-box items-center bg-[#EDEDEDF0] flex justify-center p-10 text-black mb-5">
                         <h1 className="text-sm lg:text-lg">ยังไม่มีร้านอาหาร</h1>
                       </div>
                     ) : (
-                      shop2.map((shop: Shop) => (
+                      filteredShop2.map((shop: Shop) => (
                           <div key={shop.shopID} className="card bg-base-300 w-64 flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-300 hover:cursor-pointer">
                             <figure>
                               <img
@@ -269,17 +295,40 @@ export default function TestPage() {
                         <h2 className="m-3 text-green-800">เลือกร้านอาหารที่คุณต้องการ</h2>
                       </div>
                     </div>
+
+                    <label className="flex lg:hidden input items-center gap-2 flex-none mt-5">
+                        <svg
+                        className="h-[1em] opacity-50"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        >
+                        <g
+                            strokeLinejoin="round"
+                            strokeLinecap="round"
+                            strokeWidth="2.5"
+                            fill="none"
+                            stroke="currentColor"
+                        >
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.3-4.3"></path>
+                        </g>
+                        </svg>
+
+                        <input type="search" required placeholder="Search"
+                            value={query}
+                            onChange={handleSearch}/>
+                    </label>
           
                     {/* Scrollable Container */}
                     <div className="flex flex-col items-center p-5 space-y-5">
                       
                       {/* Card */}
-                      { shop1.length === 0 ? (
+                      { filteredShop1.length === 0 ? (
                         <div className="w-full rounded-box items-center bg-[#EDEDEDF0] flex justify-center p-10 text-black mb-5">
                           <h1 className="text-sm lg:text-lg">ยังไม่มีร้านอาหาร</h1>
                         </div>
                       ) : (
-                        shop1.map((shop: Shop) => (
+                        filteredShop1.map((shop: Shop) => (
                             <div key={shop.shopID} className="card bg-base-300 w-64 flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-300 hover:cursor-pointer">
                               <figure>
                                 <img
@@ -316,17 +365,40 @@ export default function TestPage() {
                       <h1 className="text-2xl font-bold m-3 text-green-500">โรงอาหาร บพิตรพิมุข</h1>
                       <h2 className="m-3 text-green-800">เลือกร้านอาหารที่คุณต้องการ</h2>
                     </div>
+
+                    <label className="flex lg:hidden input items-center gap-2 flex-none mt-5">
+                        <svg
+                        className="h-[1em] opacity-50"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        >
+                        <g
+                            strokeLinejoin="round"
+                            strokeLinecap="round"
+                            strokeWidth="2.5"
+                            fill="none"
+                            stroke="currentColor"
+                        >
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.3-4.3"></path>
+                        </g>
+                        </svg>
+
+                        <input type="search" required placeholder="Search"
+                            value={query}
+                            onChange={handleSearch}/>
+                    </label>
           
                     {/* Scrollable Container */}
                     <div className="flex flex-col items-center p-5 space-y-5">
                       
                       {/* Card */}
-                      { shop2.length === 0 ? (
+                      { filteredShop2.length === 0 ? (
                         <div className="w-full rounded-box items-center bg-[#EDEDEDF0] flex justify-center p-10 text-black mb-5">
                           <h1 className="text-sm lg:text-lg">ยังไม่มีร้านอาหาร</h1>
                         </div>
                       ) : (
-                        shop2.map((shop: Shop) => (
+                        filteredShop2.map((shop: Shop) => (
                             <div key={shop.shopID} className="card bg-base-300 w-64 flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-300 hover:cursor-pointer">
                               <figure>
                                 <img
