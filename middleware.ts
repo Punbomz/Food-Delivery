@@ -1,8 +1,15 @@
 // middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { clearSession } from "@/lib/loginHelper";
 
 export async function middleware(request: NextRequest) {
+
+  const res = await fetch('api/auth/check');
+  if(!res.ok) {
+    await clearSession();
+  }
+
   const { pathname } = request.nextUrl;
   
   // Get session token and role from cookies
