@@ -28,7 +28,7 @@ export default function TestPage() {
 
   useEffect(() => {
     getData();
-  })
+  }, [])
   
   useEffect(() => {
     // Reset scroll position when cafeterias change

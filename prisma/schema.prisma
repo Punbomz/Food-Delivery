@@ -60,6 +60,7 @@ model Customer {
   customerPic   String?
 
   sessions Session[]
+  history  CustomerHistory[]
 }
 
 model Session {
@@ -90,6 +91,15 @@ model ShopHistory {
   shopLogout    DateTime?
 
   shop      Shop     @relation(fields: [shopID], references: [shopID])
+}
+
+model CustomerHistory {
+  customerHistoryID Int @id @default(autoincrement())
+  customerID    Int
+  customerLogin     DateTime
+  customerLogout    DateTime?
+
+  customer      Customer     @relation(fields: [customerID], references: [customerID])
 }
 
 model Food {

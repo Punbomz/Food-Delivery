@@ -2,13 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Sidebar } from "../../components/sidebar"
 import Skeleton from "@/app/components/Skeleton";
 
 type History = {
-  shopHistoryID: number;
-  shopLogin: string;
-  shopLogout: string | null;
+  customerHistoryID: number;
+  customerLogin: string;
+  customerLogout: string | null;
 };
 
 export default function CustomerHistory() {
@@ -19,21 +18,37 @@ export default function CustomerHistory() {
   const [loadingPage, setLoadingPage] = useState(true);
 
   useEffect(() => {
-    fetch("/api/history/shop")
-      .then((res) => res.json())
-      .then((data) => {
-        setHistory(data);
-      });
-    setLoadingPage(false);
+    getData();
   }, []);
 
   useEffect(() => {
     setMaxPage(Math.ceil(filteredHistory.length/10));
   }, [history]);
 
+  const getData = async () => {
+    try {
+      const res = await fetch("/api/getdata/history", {
+        credentials: "include",
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        console.error("API error:", result);
+        return;
+      }
+
+      setHistory(result);
+    } catch (error) {
+      console.error("Fetch data failed:", error);
+    } finally {
+      setLoadingPage(false);
+    }
+  };
+
   const filteredHistory = selectedDate
     ? history.filter((item) => {
-        const loginDate = new Date(item.shopLogin)
+        const loginDate = new Date(item.customerLogin)
           .toISOString()
           .split("T")[0];
         return loginDate === selectedDate;
@@ -44,12 +59,8 @@ export default function CustomerHistory() {
     <>
       <div className="p-15">
       <div className="flex gap-10 justify-center text-2xl">
-      {/* Side Bar */}
-          < Sidebar />
-          
       {/* Content */}
-      <div className="flex-3/4 shadow-lg rounded-box p-20 bg-white justify-center">
-
+      <div className="flex flex-col shadow-lg rounded-box p-20 bg-white justify-center">
         { loadingPage ? (
           <Skeleton />
         ) : (
@@ -109,9 +120,9 @@ export default function CustomerHistory() {
                 {filteredHistory
                   .slice((page - 1) * 10, page * 10)
                   .map((item) => (
-                    <div key={item.shopHistoryID}>
+                    <div key={item.customerHistoryID}>
                       <p className="text-sm mb-2 w-sm lg:w-lg mx-auto">
-                        {new Date(item.shopLogin).toLocaleDateString("th-TH", {
+                        {new Date(item.customerLogin).toLocaleDateString("th-TH", {
                           weekday: "long",
                           day: "numeric",
                           month: "long",
@@ -121,16 +132,16 @@ export default function CustomerHistory() {
 
                       <div className="bg-base-300 border rounded px-3 py-2 mb-2 w-sm lg:w-lg mx-auto text-sm">
                         เข้าใช้งานเวลา{" "}
-                        {new Date(item.shopLogin).toLocaleTimeString("th-TH", {
+                        {new Date(item.customerLogin).toLocaleTimeString("th-TH", {
                           hour: "2-digit",
                           minute: "2-digit",
                         })}
                       </div>
 
                       <div className="bg-base-300 border rounded px-3 py-2 w-sm lg:w-lg mx-auto text-sm">
-                        {item.shopLogout
+                        {item.customerLogout
                           ? `ออกจากระบบเวลา ${new Date(
-                              item.shopLogout
+                              item.customerLogout
                             ).toLocaleTimeString("th-TH", {
                               hour: "2-digit",
                               minute: "2-digit",

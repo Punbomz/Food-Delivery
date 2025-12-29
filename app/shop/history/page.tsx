@@ -19,17 +19,33 @@ export default function ShopHistory() {
   const [loadingPage, setLoadingPage] = useState(true);
 
   useEffect(() => {
-    fetch("/api/history/shop")
-      .then((res) => res.json())
-      .then((data) => {
-        setHistory(data);
-      });
-    setLoadingPage(false);
+    getData();
   }, []);
 
   useEffect(() => {
     setMaxPage(Math.ceil(filteredHistory.length/10));
   }, [history]);
+
+  const getData = async () => {
+    try {
+      const res = await fetch("/api/getdata/history", {
+        credentials: "include",
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        console.error("API error:", result);
+        return;
+      }
+
+      setHistory(result);
+    } catch (error) {
+      console.error("Fetch data failed:", error);
+    } finally {
+      setLoadingPage(false);
+    }
+  };
 
   const filteredHistory = selectedDate
     ? history.filter((item) => {
