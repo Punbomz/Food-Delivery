@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
+
   const { pathname } = request.nextUrl;
   
   // Get session token and role from cookies
@@ -34,9 +35,19 @@ export async function middleware(request: NextRequest) {
       return NextResponse.next();
     }
     if (isProtectedRoute) {
-      return NextResponse.redirect(new URL("/", request.url));
+      const res = NextResponse.redirect(new URL("/", request.url));
+      res.cookies.delete("session");
+      res.cookies.delete("role");
+      return res;
     }
     return NextResponse.next();
+  }
+
+  if (token && !role) {
+    const res = NextResponse.redirect(new URL("/", request.url));
+    res.cookies.delete("session");
+    res.cookies.delete("role");
+    return res;
   }
 
   // Has session - redirect to appropriate dashboard
