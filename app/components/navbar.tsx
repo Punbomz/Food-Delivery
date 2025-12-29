@@ -146,7 +146,9 @@ export function Navbar() {
                         )}
 
                         { !user && (
-                            <NavbarSearch />
+                            <Suspense fallback={null}>
+                                <NavbarSearch />
+                            </Suspense>
                         )}
                         { user && role === "shop" && (
                             <>
