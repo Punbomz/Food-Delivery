@@ -12,7 +12,7 @@ type ShopProfile = {
   shopLocation: string;
   shopOpenTime: string;
   shopCloseTime: string;
-  isOpen: Boolean;
+  isOpen: boolean;
   shopPic?: string | null;
   shopQR?: string | null;
 };

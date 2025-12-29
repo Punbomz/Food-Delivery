@@ -22,7 +22,7 @@ export default function customerLogin() {
     });
 
     if (res.ok) {
-      showAlert("เข้าสู่ระบบสำเร็จ!", "/customer");
+      showAlert("เข้าสู่ระบบสำเร็จ!", "/");
     } else {
       showAlert("อีเมลหรือรหัสผ่านไม่ถูกต้อง!");
     }

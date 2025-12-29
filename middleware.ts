@@ -12,7 +12,7 @@ export async function middleware(request: NextRequest) {
   // Define default dashboards for each role
   const dashboards = {
     shop: "/shop",
-    user: "/",
+    customer: "/",
     admin: "/admin"
   };
 
@@ -62,7 +62,7 @@ export async function middleware(request: NextRequest) {
     if (isProtectedRoute) {
       // Customer trying to access shop/admin
       if (role === "user" && !pathname.startsWith("/customer")) {
-        return NextResponse.redirect(new URL(dashboards.user, request.url));
+        return NextResponse.redirect(new URL(dashboards.customer, request.url));
       }
 
       // Shop trying to access admin/customer

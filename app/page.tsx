@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import Skeleton2 from "./components/Skeleton2";
+import AlertModal from "@/app/components/AlertModal";
+import { useAlertModal } from "@/app/hooks/useAlertModal";
 
 interface Shop {
   shopID: number;
@@ -20,6 +22,7 @@ export default function TestPage() {
   const scrollRef1 = useRef<HTMLDivElement>(null);
   const scrollRef2 = useRef<HTMLDivElement>(null);
   const [loadingPage, setLoadingPage] = useState(true);
+  const { isOpen, message, navigateTo, showAlert, closeAlert } = useAlertModal();
 
   const [shop, setShop] = useState<Shop | null>(null);
 
@@ -80,12 +83,19 @@ export default function TestPage() {
         setLoadingPage(false);
       }
     } catch(error) {
-      console.error("Fetch user data failed:", error);
+      showAlert("Fetch user data failed");
     }
   }
 
   return (
     <>
+      <AlertModal
+        isOpen={isOpen}
+        message={message}
+        navigateTo={navigateTo}
+        onClose={closeAlert}
+      />
+
       { loadingPage ? (
         <Skeleton2 />
       ) : (

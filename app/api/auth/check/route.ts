@@ -21,6 +21,11 @@ export async function GET() {
         where: { shopID: user.id },
       });
       pic = shopUser?.shopPic ?? "";
+    } else if(role === "customer") {
+      const customerUser = await prisma.customer.findUnique({
+        where: { customerID: user.id },
+      });
+      pic = customerUser?.customerPic ?? "";
     }
 
     return NextResponse.json(

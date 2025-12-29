@@ -9,8 +9,8 @@ export async function POST(request: Request) {
   const Pass = formData.get("Pass") as string;
   const Remember = formData.get("Remember") === "on";
 
-  const customer = await prisma.user.findUnique({
-    where: { userEmail: Email },
+  const customer = await prisma.customer.findUnique({
+    where: { customerEmail: Email },
   });
 
   if (!customer) {
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
   }
 
   // Compare Password
-  const isMatch = await bcrypt.compare(Pass, customer.userPass);
+  const isMatch = await bcrypt.compare(Pass, customer.customerPass);
 
   if (!isMatch) {
     return Response.json(
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
   await prisma.session.create({
     data: {
       token,
-      userId: customer.userID,
+      customerId: customer.customerID,
       expiresAt,
     },
   });
@@ -61,6 +61,13 @@ export async function POST(request: Request) {
   cookieStore.set("role", "customer", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    expires: expiresAt,
+    path: "/",
+  });
+
+  cookieStore.set("customerId", String(customer.customerID), {
+    httpOnly: true,
     sameSite: "lax",
     expires: expiresAt,
     path: "/",

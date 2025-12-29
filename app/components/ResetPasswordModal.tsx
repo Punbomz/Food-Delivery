@@ -6,11 +6,10 @@ import { usePathname } from "next/navigation";
 interface ResetPasswordModalProps {
   isOpen: boolean;
   onClose: () => void;
-  shopID: number | null;
   onAlert: (message: string) => void;
 }
 
-export default function ResetPasswordModal({ isOpen, onClose, shopID, onAlert }: ResetPasswordModalProps) {
+export default function ResetPasswordModal({ isOpen, onClose, onAlert }: ResetPasswordModalProps) {
   const [show, setShow] = useState(false);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -67,12 +66,12 @@ export default function ResetPasswordModal({ isOpen, onClose, shopID, onAlert }:
 
     try {
       const res = await fetch("/api/changePass", {
+        credentials: "include",
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          id: shopID,
           oldPassword,
           newPassword,
           role,

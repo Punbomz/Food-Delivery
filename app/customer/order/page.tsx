@@ -11,7 +11,7 @@ type History = {
   shopLogout: string | null;
 };
 
-export default function ShopHistory() {
+export default function CustomerOrder() {
   const [history, setHistory] = useState<History[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [page, setPage] = useState(1);
