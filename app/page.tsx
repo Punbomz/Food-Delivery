@@ -24,7 +24,7 @@ export default function TestPage() {
   const [loadingPage, setLoadingPage] = useState(true);
   const { isOpen, message, navigateTo, showAlert, closeAlert } = useAlertModal();
 
-  const [shop, setShop] = useState<Shop | null>(null);
+  const [shops, setShop] = useState<Shop[]>([]);
 
   useEffect(() => {
     getData();
@@ -87,6 +87,9 @@ export default function TestPage() {
     }
   }
 
+  const shop1 = shops.filter((shop: Shop) => shop.shopLocation === "ตึก 80");
+  const shop2 = shops.filter((shop: Shop) => shop.shopLocation === "บพิตรพิมุข");
+
   return (
     <>
       <AlertModal
@@ -117,24 +120,33 @@ export default function TestPage() {
                   >
                     
                     {/* Card */}
-                    <div className="card bg-[#EAEAEA] w-64 flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-300">
-                      <figure>
-                        <img
-                          src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-                          alt="เมนู" 
-                          className="w-full h-48 object-cover"
-                        />
-                      </figure>
-                      <div className="card-body">
-                        <h2 className="card-title">ร้านข้าวมันไก่</h2>
-                        <p>คำแนะนำร้าน</p>
-                        <div className="justify-center">
-                          <div className="bg-[#DAFFE4] rounded-full p-2 mt-2 text-center font-bold">
-                            สั่งเลย!
-                          </div>
-                        </div>
+                    { shop1.length === 0 ? (
+                      <div className="w-full rounded-box items-center bg-[#EDEDEDF0] flex justify-center p-10 text-black mb-5">
+                        <h1 className="text-sm lg:text-lg">ยังไม่มีร้านอาหาร</h1>
                       </div>
-                    </div>
+                    ) : (
+                      shop1.map((shop: Shop) => (
+                          <div key={shop.shopID} className="card bg-base-300 w-64 flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-300 hover:cursor-pointer">
+                            <figure>
+                              <img
+                                src={shop.shopPic}
+                                alt="Shop" 
+                                className="w-full h-48 object-cover"
+                              />
+                            </figure>
+                            <div className="card-body">
+                              <h2 className="card-title">{shop.shopName}</h2>
+                              <p>{shop.shopDetail}</p>
+                              <div className="justify-center">
+                                <div className="bg-warning rounded-full p-2 mt-2 text-center font-bold">
+                                  สั่งเลย!
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      )
+                    )}
 
                   </div>
                   
@@ -156,24 +168,33 @@ export default function TestPage() {
                   >
                     
                     {/* Card */}
-                    <div className="card bg-[#EAEAEA] w-64 flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-300">
-                      <figure>
-                        <img
-                          src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-                          alt="เมนู" 
-                          className="w-full h-48 object-cover"
-                        />
-                      </figure>
-                      <div className="card-body">
-                        <h2 className="card-title">ร้านข้าวมันไก่</h2>
-                        <p>คำแนะนำร้าน</p>
-                        <div className="justify-center">
-                          <div className="bg-[#DAFFE4] rounded-full p-2 mt-2 text-center font-bold">
-                            เริ่มต้น 35
-                          </div>
-                        </div>
+                    { shop2.length === 0 ? (
+                      <div className="w-full rounded-box items-center bg-[#EDEDEDF0] flex justify-center p-10 text-black mb-5">
+                        <h1 className="text-sm lg:text-lg">ยังไม่มีร้านอาหาร</h1>
                       </div>
-                    </div>
+                    ) : (
+                      shop2.map((shop: Shop) => (
+                          <div key={shop.shopID} className="card bg-base-300 w-64 flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-300 hover:cursor-pointer">
+                            <figure>
+                              <img
+                                src={shop.shopPic}
+                                alt="Shop" 
+                                className="w-full h-48 object-cover"
+                              />
+                            </figure>
+                            <div className="card-body">
+                              <h2 className="card-title">{shop.shopName}</h2>
+                              <p>{shop.shopDetail}</p>
+                              <div className="justify-center">
+                                <div className="bg-warning rounded-full p-2 mt-2 text-center font-bold">
+                                  สั่งเลย!
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      )
+                    )}
 
                   </div>
                   
@@ -193,7 +214,7 @@ export default function TestPage() {
                       <h2 className="m-3">🍜 เลือกร้านอาหารที่อยากสั่งได้เลย!</h2>
                     </div>
                     
-                    <div className="card bg-base-100 w-96 shadow-lg justify-center items-center mx-auto mt-5 hover:scale-105 transition-transform duration-300">
+                    <div onClick={() => setCafeterias("ตึก 80")} className="card bg-base-300 w-80 shadow-lg justify-center items-center mx-auto mt-5 hover:scale-105 transition-transform duration-300 hover:cursor-pointer">
                       <figure className="px-10 pt-10">
                         <img
                           src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
@@ -208,14 +229,12 @@ export default function TestPage() {
                           <p>เบอร์โทร: 099-999-999</p>
                         </div>
                         <div className="card-actions">
-                          <button className="btn btn-success text-white w-40"
-                          onClick={() => setCafeterias("ตึก 80")}
-                          >เลือก</button>
+                          <button className="btn btn-success text-white w-40">เลือก</button>
                         </div>
                       </div>
                     </div>
 
-                    <div className="card bg-base-100 w-96 shadow-lg justify-center items-center mx-auto mt-5 hover:scale-105 transition-transform duration-300">
+                    <div onClick={() => setCafeterias("บพิตรพิมุข")} className="card bg-base-300 w-80 shadow-lg justify-center items-center mx-auto mt-5 hover:scale-105 transition-transform duration-300 hover:cursor-pointer">
                       <figure className="px-10 pt-10">
                         <img
                           src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
@@ -255,24 +274,33 @@ export default function TestPage() {
                     <div className="flex flex-col items-center p-5 space-y-5">
                       
                       {/* Card */}
-                      <div className="card bg-[#EAEAEA] w-70 flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-300">
-                        <figure>
-                          <img
-                            src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-                            alt="เมนู" 
-                            className="w-full h-48 object-cover"
-                          />
-                        </figure>
-                        <div className="card-body">
-                          <h2 className="card-title">ร้านข้าวมันไก่</h2>
-                          <p>คำแนะนำร้าน</p>
-                          <div className="justify-center">
-                            <div className="bg-[#DAFFE4] rounded-full p-2 mt-2 text-center font-bold hover:scale-115 transition-transform duration-300">
-                              สั่งเลย!
-                            </div>
-                          </div>
+                      { shop1.length === 0 ? (
+                        <div className="w-full rounded-box items-center bg-[#EDEDEDF0] flex justify-center p-10 text-black mb-5">
+                          <h1 className="text-sm lg:text-lg">ยังไม่มีร้านอาหาร</h1>
                         </div>
-                      </div>
+                      ) : (
+                        shop1.map((shop: Shop) => (
+                            <div key={shop.shopID} className="card bg-base-300 w-64 flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-300 hover:cursor-pointer">
+                              <figure>
+                                <img
+                                  src={shop.shopPic}
+                                  alt="Shop" 
+                                  className="w-full h-48 object-cover"
+                                />
+                              </figure>
+                              <div className="card-body">
+                                <h2 className="card-title">{shop.shopName}</h2>
+                                <p>{shop.shopDetail}</p>
+                                <div className="justify-center">
+                                  <div className="bg-warning rounded-full p-2 mt-2 text-center font-bold">
+                                    สั่งเลย!
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        )
+                      )}
 
                     </div>
                   </div>
@@ -293,24 +321,33 @@ export default function TestPage() {
                     <div className="flex flex-col items-center p-5 space-y-5">
                       
                       {/* Card */}
-                      <div className="card bg-[#EAEAEA] w-70 flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-300">
-                        <figure>
-                          <img
-                            src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-                            alt="เมนู" 
-                            className="w-full h-48 object-cover"
-                          />
-                        </figure>
-                        <div className="card-body">
-                          <h2 className="card-title">ร้านข้าวมันไก่</h2>
-                          <p>คำแนะนำร้าน</p>
-                          <div className="justify-center">
-                            <div className="bg-[#DAFFE4] rounded-full p-2 mt-2 text-center font-bold hover:scale-115 transition-transform duration-300">
-                              สั่งเลย!
-                            </div>
-                          </div>
+                      { shop2.length === 0 ? (
+                        <div className="w-full rounded-box items-center bg-[#EDEDEDF0] flex justify-center p-10 text-black mb-5">
+                          <h1 className="text-sm lg:text-lg">ยังไม่มีร้านอาหาร</h1>
                         </div>
-                      </div>
+                      ) : (
+                        shop2.map((shop: Shop) => (
+                            <div key={shop.shopID} className="card bg-base-300 w-64 flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-300 hover:cursor-pointer">
+                              <figure>
+                                <img
+                                  src={shop.shopPic}
+                                  alt="Shop" 
+                                  className="w-full h-48 object-cover"
+                                />
+                              </figure>
+                              <div className="card-body">
+                                <h2 className="card-title">{shop.shopName}</h2>
+                                <p>{shop.shopDetail}</p>
+                                <div className="justify-center">
+                                  <div className="bg-warning rounded-full p-2 mt-2 text-center font-bold">
+                                    สั่งเลย!
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        )
+                      )}
 
                     </div>
                   </div>

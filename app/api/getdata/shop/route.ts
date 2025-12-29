@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(
-      { shop },
+      shop,
       { status: 200 }
     );
 
