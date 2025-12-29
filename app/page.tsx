@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
 import Skeleton2 from "./components/Skeleton2";
 import AlertModal from "@/app/components/AlertModal";
 import { useAlertModal } from "@/app/hooks/useAlertModal";
@@ -296,28 +296,30 @@ export default function TestPage() {
                       </div>
                     </div>
 
-                    <label className="flex lg:hidden input items-center gap-2 flex-none mt-5">
-                        <svg
-                        className="h-[1em] opacity-50"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        >
-                        <g
-                            strokeLinejoin="round"
-                            strokeLinecap="round"
-                            strokeWidth="2.5"
-                            fill="none"
-                            stroke="currentColor"
-                        >
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <path d="m21 21-4.3-4.3"></path>
-                        </g>
-                        </svg>
+                    <Suspense fallback={null}>
+                      <label className="flex lg:hidden input items-center gap-2 flex-none mt-5">
+                          <svg
+                          className="h-[1em] opacity-50"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          >
+                          <g
+                              strokeLinejoin="round"
+                              strokeLinecap="round"
+                              strokeWidth="2.5"
+                              fill="none"
+                              stroke="currentColor"
+                          >
+                              <circle cx="11" cy="11" r="8"></circle>
+                              <path d="m21 21-4.3-4.3"></path>
+                          </g>
+                          </svg>
 
-                        <input type="search" required placeholder="Search"
-                            value={query}
-                            onChange={handleSearch}/>
-                    </label>
+                          <input type="search" required placeholder="Search"
+                              value={query}
+                              onChange={handleSearch}/>
+                      </label>
+                    </Suspense>
           
                     {/* Scrollable Container */}
                     <div className="flex flex-col items-center p-5 space-y-5">
@@ -366,28 +368,30 @@ export default function TestPage() {
                       <h2 className="m-3 text-green-800">เลือกร้านอาหารที่คุณต้องการ</h2>
                     </div>
 
-                    <label className="flex lg:hidden input items-center gap-2 flex-none mt-5">
-                        <svg
-                        className="h-[1em] opacity-50"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        >
-                        <g
-                            strokeLinejoin="round"
-                            strokeLinecap="round"
-                            strokeWidth="2.5"
-                            fill="none"
-                            stroke="currentColor"
-                        >
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <path d="m21 21-4.3-4.3"></path>
-                        </g>
-                        </svg>
+                    <Suspense fallback={null}>
+                      <label className="flex lg:hidden input items-center gap-2 flex-none mt-5">
+                          <svg
+                          className="h-[1em] opacity-50"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          >
+                          <g
+                              strokeLinejoin="round"
+                              strokeLinecap="round"
+                              strokeWidth="2.5"
+                              fill="none"
+                              stroke="currentColor"
+                          >
+                              <circle cx="11" cy="11" r="8"></circle>
+                              <path d="m21 21-4.3-4.3"></path>
+                          </g>
+                          </svg>
 
-                        <input type="search" required placeholder="Search"
-                            value={query}
-                            onChange={handleSearch}/>
-                    </label>
+                          <input type="search" required placeholder="Search"
+                              value={query}
+                              onChange={handleSearch}/>
+                      </label>
+                    </Suspense>
           
                     {/* Scrollable Container */}
                     <div className="flex flex-col items-center p-5 space-y-5">
