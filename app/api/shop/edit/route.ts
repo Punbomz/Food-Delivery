@@ -115,7 +115,7 @@ export async function POST(request: Request) {
     });
   } catch (error) {
       return NextResponse.json(
-          { message: "อีเมลนี้มีการสมัครสมาชิกแล้ว!" },
+          { message: "บันทึกข้อมูลผิดพลาด! กรุณาลองใหม่อีกครั้ง" },
           { status: 409 }
       );
   }

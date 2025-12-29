@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from "react";
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams  } from 'next/navigation';
 import AlertModal from "../components/AlertModal";
 import { useAlertModal } from "../hooks/useAlertModal";
 import ConfirmModal from './ConfirmModal';
@@ -18,6 +18,10 @@ interface User {
 
 export function Navbar() {
     const { isOpen, message, navigateTo, showAlert, closeAlert } = useAlertModal();
+    const router = useRouter();
+    const searchParams = useSearchParams();
+
+    const query = searchParams.get("srch") ?? "";
 
     const { 
         isOpen: isConfirmOpen, 
@@ -39,6 +43,19 @@ export function Navbar() {
         checkAuth();
     }, []);
 
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        const params = new URLSearchParams(searchParams.toString());
+
+        if (value) {
+            params.set("srch", value);
+        } else {
+            params.delete("srch");
+        }
+
+        router.push(`?${params.toString()}`);
+    };
+
     const checkAuth = async () => {
         try {
             const res = await fetch("/api/auth/check", {
@@ -56,33 +73,44 @@ export function Navbar() {
         }
     };
 
-    const handleLogout = async () => {
+    const handleLogout = (path: string | null = null) => {
+        let text = "ยืนยันการออกจากระบบ?";
+        if(path !== null) {
+            text = "ยืนยันการออกจากระบบ?\nคุณต้องออกจากระบบเพื่อดำเนินการต่อ";
+        }
         showConfirm(
-        "ยืนยันการออกจากระบบ?",
-        async () => {
+            text,
+            async () => {
             setLoading(true);
             try {
-            const res = await fetch("/api/logout", {
+                const res = await fetch("/api/logout", {
                 method: "POST",
                 credentials: "include",
-            });
+                });
 
-            if (res.ok) {
+                if (res.ok) {
                 setUser(null);
-                showAlert("ออกจากระบบสำเร็จ!", "/");
-            }
-            } catch (error) {
-            showAlert("เกิดข้อผิดพลาดในการออกจากระบบ!");
-            }
 
-            setLoading(false);
-        },
+                if (path) {
+                    router.push(path);
+                    router.refresh();
+                } else {
+                    router.push("/");
+                    router.refresh();
+                }
+                }
+            } catch (error) {
+                showAlert("เกิดข้อผิดพลาดในการออกจากระบบ!");
+            } finally {
+                setLoading(false);
+            }
+            },
             undefined,
-        {
+            {
             title: "ออกจากระบบ",
             confirmText: "ยืนยัน",
-            cancelText: "ยกเลิก"
-        }
+            cancelText: "ยกเลิก",
+            }
         );
     };
 
@@ -118,7 +146,7 @@ export function Navbar() {
                     </div>
                     
                     <div className="flex flex-1 items-center gap-3">
-                        { user ? (
+                        { user && role !== "customer" ? (
                             <Link href="/" className="mx-2 px-2 whitespace-nowrap md:hidden">
                                 <img src="/RMUTK_Logo.png" className='w-20' />
                             </Link>
@@ -127,7 +155,8 @@ export function Navbar() {
                                 <img src="/RMUTK_Logo.png" className='w-20' />
                             </Link>
                         )}
-                        { !user ? (
+
+                        { !user && (
                             <>
                                 <label className="hidden sm:flex input items-center gap-2 flex-none">
                                     <svg
@@ -147,10 +176,13 @@ export function Navbar() {
                                     </g>
                                     </svg>
 
-                                    <input type="search" required placeholder="Search" />
+                                    <input type="search" required placeholder="Search"
+                                        value={query}
+                                        onChange={handleSearch}/>
                                 </label>
                             </>
-                        ) : role === "shop" && (
+                        )}
+                        { user && role === "shop" && (
                             <>
                             <div className='hidden md:flex items-center gap-3'>
                                 <Link href="/shop" className="avatar p-2">
@@ -162,9 +194,43 @@ export function Navbar() {
                             </div>
                             </>
                         )}
+                        { user && role === "customer" && (
+                            <>
+                                <label className="hidden sm:flex input items-center gap-2 flex-none">
+                                    <svg
+                                    className="h-[1em] opacity-50"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    >
+                                    <g
+                                        strokeLinejoin="round"
+                                        strokeLinecap="round"
+                                        strokeWidth="2.5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                    >
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <path d="m21 21-4.3-4.3"></path>
+                                    </g>
+                                    </svg>
+
+                                    <input type="search" required placeholder="Search"
+                                        value={query}
+                                        onChange={handleSearch}/>
+                                </label>
+
+                                <Link href="/customer/cart" className='hidden lg:block'>
+                                    <i className='fas text-xl'>&#xf07a;</i>
+                                </Link>
+
+                                <Link href="/customer/cart" className='fixed right-10 lg:hidden'>
+                                    <i className='fas text-xl'>&#xf07a;</i>
+                                </Link>
+                            </>
+                        )}
                     </div>
-                    <div className="hidden flex-none lg:block">
-                        <ul className="menu menu-horizontal px-5 gap-5">
+                    <div className="hidden flex-none items-center lg:flex">
+                        <ul className="menu menu-horizontal items-center px-5 gap-5">
                             { !user && (
                                 <>
                                     <li><Link href="/" >หน้าหลัก</Link></li>
@@ -172,14 +238,32 @@ export function Navbar() {
                                     <li><Link href="/login/shop">สำหรับร้านค้า</Link></li>
                                 </>
                             )}
+                            { user && role === "customer" && (
+                                <>
+                                    <li><Link href="/" >หน้าหลัก</Link></li>
+                                    <li><Link href="/">สั่งอาหาร</Link></li>
+                                    <li><Link href="/customer/order" >คำสั่งซื้อ</Link></li>
+                                    <li><Link href="/customer/order_history">ประวัติการสั่งซื้อ</Link></li>
+                                    <li><div onClick={() => handleLogout("/register/shop")}>สนใจเปิดร้านค้า</div></li>
+                                </>
+                            )}
                             { loading ? (
                                 <li className="w-20 flex justify-center">
                                     <span className="loading loading-spinner loading-sm"></span>
                                 </li>
                                 ) : user ? (
-                                <li className="btn btn-error rounded-full w-20" onClick={handleLogout}>
-                                    Logout
-                                </li>
+                                    <>
+                                        { role === "customer" && (
+                                            <Link href="/profile/customer" className="avatar">
+                                                <div className="ring-primary ring-offset-base-100 w-10 rounded-full ring-2 ring-offset-2">
+                                                    <img src={ user.pic !== "" ? (user.pic) : ("/profile.jpg")} />
+                                                </div>
+                                            </Link>
+                                        )}
+                                        <li className="btn btn-error rounded-full w-20" onClick={() => handleLogout()}>
+                                            Logout
+                                        </li>
+                                    </>
                                 ) : (
                                 <li className="btn btn-accent rounded-full w-20" onClick={() => window.location.href = "/login/customer"}>
                                     Login
@@ -215,7 +299,7 @@ export function Navbar() {
                             </li>
                         </>
                     )}
-                    { role === "shop" && (
+                    { user && role === "shop" && (
                         <>
                             <li><Link href="/shop/order" className={`btn btn-ghost w-full flex items-center justify-start gap-3 text-left ${pathname==="/shop/order" ? "btn-active" : ""}`}>
                                 <svg width="30" height="30" viewBox="0 0 47 41" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -249,10 +333,42 @@ export function Navbar() {
                             </li>
                         </>
                     )}
+                    { user && role === "customer" && (
+                        <>
+                            <li><Link href="/" className={`btn btn-ghost w-full flex items-center justify-start gap-3 text-left ${pathname==="/" ? "btn-active" : ""}`}>
+                                <svg width="30" height="30" viewBox="0 0 47 41" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M29.375 35.8752V22.2085C29.375 21.7554 29.1687 21.3209 28.8014 21.0005C28.4342 20.6802 27.936 20.5002 27.4167 20.5002H19.5833C19.064 20.5002 18.5658 20.6802 18.1986 21.0005C17.8313 21.3209 17.625 21.7554 17.625 22.2085V35.8752M5.875 17.0835C5.87486 16.5865 5.99903 16.0954 6.23883 15.6446C6.47864 15.1938 6.82831 14.794 7.26346 14.4732L20.9718 4.22317C21.6787 3.70197 22.5744 3.41602 23.5 3.41602C24.4256 3.41602 25.3213 3.70197 26.0282 4.22317L39.7365 14.4732C40.1717 14.794 40.5214 15.1938 40.7612 15.6446C41.001 16.0954 41.1251 16.5865 41.125 17.0835V32.4585C41.125 33.3647 40.7124 34.2337 39.9778 34.8744C39.2433 35.5152 38.2471 35.8752 37.2083 35.8752H9.79167C8.7529 35.8752 7.75668 35.5152 7.02217 34.8744C6.28765 34.2337 5.875 33.3647 5.875 32.4585V17.0835Z" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                                หน้าหลัก</Link>
+                            </li>
+                            <li><Link href="/customer/order" className={`btn btn-ghost w-full flex items-center justify-start gap-3 text-left ${pathname==="/customer/order" ? "btn-active" : ""}`}>
+                                <svg width="30" height="30" viewBox="0 0 47 41" fill="none" xmlns="httwww.w3.org/2000/svg">
+                                    <path d="M5.875 3.41699V15.3753C5.875 17.2545 7.6375 18.792 9.79167 18.792H17.625C18.6638 18.792 19.66 18.432 20.3945 17.7913C21.129 17.1505 21.5417 16.2815 21.5417 15.3753V3.41699M13.7083 3.41699V37.5837M41.125 25.6253V3.41699C38.5281 3.41699 36.0375 4.31692 34.2012 5.91879C32.365 7.52066 31.3333 9.69327 31.3333 11.9587V22.2087C31.3333 24.0878 33.0958 25.6253 35.25 25.6253H41.125ZM41.125 25.6253V37.5837" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                                คำสั่งซื้อ</Link>
+                            </li>
+                            <li><Link href="/customer/order_history" className={`btn btn-ghost w-full flex items-center justify-start gap-3 text-left ${pathname==="/customer/order_history" ? "btn-active" : ""}`}>
+                                <i className='far text-xl'>&#xf328;</i>
+                                ประวัติการสั่งซื้อ</Link>
+                            </li>
+                            <li><div onClick={() => handleLogout("/register/shop")} className={`btn btn-ghost w-full flex items-center justify-start gap-3 text-left`}>
+                                <i className='far text-xl'>&#xf2b5;</i>
+                                สนใจเปิดร้านค้า</div>
+                            </li>
+                            <li><Link href="/profile/customer" className={`btn btn-ghost w-full flex items-center justify-start gap-3 text-left ${pathname==="/profile/customer" ? "btn-active" : ""}`}>
+                                <div className="avatar">
+                                    <div className="ring-primary ring-offset-base-100 w-7 rounded-full ring-2">
+                                        <img src={ user.pic !== "" ? (user.pic) : ("/profile.jpg")} />
+                                    </div>
+                                </div>
+                                โปรไฟล์</Link>
+                            </li>
+                        </>
+                    )}
                     { user ? (
                         <li>
                             { !loading ? (
-                                <div onClick={handleLogout} className={`btn btn-ghost w-full flex items-center justify-start gap-3 text-left`}>
+                                <div onClick={() => handleLogout()} className={`btn btn-ghost w-full flex items-center justify-start gap-3 text-left`}>
                                 <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="httwww.w3.org/2000/svg">
                                     <path d="M11.2083 21.4167L18.5 14.125M18.5 14.125L11.2083 6.83333M18.5 14.125H1M18.5 1H24.3333C25.1069 1 25.8487 1.30729 26.3957 1.85427C26.9427 2.40125 27.25 3.14312 27.25 3.91667V24.3333C27.25 25.1069 26.9427 25.8487 26.3957 26.3957C25.8487 26.9427 25.1069 27.25 24.3333 27.25H18.5" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                 </svg>
@@ -267,7 +383,7 @@ export function Navbar() {
                         </li>
                     ) : (
                         <li>
-                            <Link href="/customer/login" className={`btn btn-ghost w-full flex items-center justify-start gap-3 text-left`}>
+                            <Link href="/login/customer" className={`btn btn-ghost w-full flex items-center justify-start gap-3 text-left`}>
                             <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="httwww.w3.org/2000/svg">
                                 <path d="M11.2083 21.4167L18.5 14.125M18.5 14.125L11.2083 6.83333M18.5 14.125H1M18.5 1H24.3333C25.1069 1 25.8487 1.30729 26.3957 1.85427C26.9427 2.40125 27.25 3.14312 27.25 3.91667V24.3333C27.25 25.1069 26.9427 25.8487 26.3957 26.3957C25.8487 26.9427 25.1069 27.25 24.3333 27.25H18.5" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>

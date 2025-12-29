@@ -73,6 +73,13 @@ export async function POST(request: Request) {
     path: "/",
   });
 
+  cookieStore.set("shopId", String(shop.shopID), {
+    httpOnly: true,
+    sameSite: "lax",
+    expires: expiresAt,
+    path: "/",
+  });
+
   return Response.json(
     { message: "เข้าสู่ระบบสำเร็จ!" },
     { status: 200 }

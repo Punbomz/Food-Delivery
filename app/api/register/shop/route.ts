@@ -92,6 +92,11 @@ export async function POST(request: Request) {
                 { message: "อีเมลนี้มีการสมัครสมาชิกแล้ว!" },
                 { status: 409 }
             );
+        } else {
+          return NextResponse.json(
+            { message: "สมัครสมาชิกไม่สำเร็จ!" },
+            { status: 401 }
+          );
         }
     }
 

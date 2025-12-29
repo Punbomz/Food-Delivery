@@ -212,7 +212,6 @@ export default function shopProfile() {
       <ResetPasswordModal
         isOpen={isResetPasswordOpen}
         onClose={() => setResetPasswordOpen(false)}
-        shopID={shopID}
         onAlert={showAlert}
       />
     

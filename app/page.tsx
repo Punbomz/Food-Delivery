@@ -2,6 +2,9 @@
 
 import { useState, useRef, useEffect } from "react";
 import Skeleton2 from "./components/Skeleton2";
+import AlertModal from "@/app/components/AlertModal";
+import { useAlertModal } from "@/app/hooks/useAlertModal";
+import { useSearchParams, useRouter } from "next/navigation";
 
 interface Shop {
   shopID: number;
@@ -20,12 +23,17 @@ export default function TestPage() {
   const scrollRef1 = useRef<HTMLDivElement>(null);
   const scrollRef2 = useRef<HTMLDivElement>(null);
   const [loadingPage, setLoadingPage] = useState(true);
+  const { isOpen, message, navigateTo, showAlert, closeAlert } = useAlertModal();
 
-  const [shop, setShop] = useState<Shop | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const query = searchParams.get("srch")?.toLowerCase() || "";
+
+  const [shops, setShop] = useState<Shop[]>([]);
 
   useEffect(() => {
     getData();
-  })
+  }, [])
   
   useEffect(() => {
     // Reset scroll position when cafeterias change
@@ -80,12 +88,43 @@ export default function TestPage() {
         setLoadingPage(false);
       }
     } catch(error) {
-      console.error("Fetch user data failed:", error);
+      showAlert("Fetch user data failed");
     }
   }
 
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        const params = new URLSearchParams(searchParams.toString());
+
+        if (value) {
+            params.set("srch", value);
+        } else {
+            params.delete("srch");
+        }
+
+        router.push(`?${params.toString()}`);
+    };
+
+  const shop1 = shops.filter((shop: Shop) => shop.shopLocation === "ตึก 80");
+  const filteredShop1 = shop1.filter((shop: Shop) =>
+    shop.shopName.toLowerCase().includes(query) ||
+    shop.shopDetail?.toLowerCase().includes(query)
+  );
+  const shop2 = shops.filter((shop: Shop) => shop.shopLocation === "บพิตรพิมุข");
+  const filteredShop2 = shop2.filter((shop: Shop) =>
+    shop.shopName.toLowerCase().includes(query) ||
+    shop.shopDetail?.toLowerCase().includes(query)
+  );
+
   return (
     <>
+      <AlertModal
+        isOpen={isOpen}
+        message={message}
+        navigateTo={navigateTo}
+        onClose={closeAlert}
+      />
+
       { loadingPage ? (
         <Skeleton2 />
       ) : (
@@ -107,24 +146,33 @@ export default function TestPage() {
                   >
                     
                     {/* Card */}
-                    <div className="card bg-[#EAEAEA] w-64 flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-300">
-                      <figure>
-                        <img
-                          src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-                          alt="เมนู" 
-                          className="w-full h-48 object-cover"
-                        />
-                      </figure>
-                      <div className="card-body">
-                        <h2 className="card-title">ร้านข้าวมันไก่</h2>
-                        <p>คำแนะนำร้าน</p>
-                        <div className="justify-center">
-                          <div className="bg-[#DAFFE4] rounded-full p-2 mt-2 text-center font-bold">
-                            สั่งเลย!
-                          </div>
-                        </div>
+                    { filteredShop1.length === 0 ? (
+                      <div className="w-full rounded-box items-center bg-[#EDEDEDF0] flex justify-center p-10 text-black mb-5">
+                        <h1 className="text-sm lg:text-lg">ยังไม่มีร้านอาหาร</h1>
                       </div>
-                    </div>
+                    ) : (
+                      filteredShop1.map((shop: Shop) => (
+                          <div key={shop.shopID} className="card bg-base-300 w-64 flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-300 hover:cursor-pointer">
+                            <figure>
+                              <img
+                                src={shop.shopPic}
+                                alt="Shop" 
+                                className="w-full h-48 object-cover"
+                              />
+                            </figure>
+                            <div className="card-body">
+                              <h2 className="card-title">{shop.shopName}</h2>
+                              <p>{shop.shopDetail}</p>
+                              <div className="justify-center">
+                                <div className="bg-warning rounded-full p-2 mt-2 text-center font-bold">
+                                  สั่งเลย!
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      )
+                    )}
 
                   </div>
                   
@@ -146,24 +194,33 @@ export default function TestPage() {
                   >
                     
                     {/* Card */}
-                    <div className="card bg-[#EAEAEA] w-64 flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-300">
-                      <figure>
-                        <img
-                          src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-                          alt="เมนู" 
-                          className="w-full h-48 object-cover"
-                        />
-                      </figure>
-                      <div className="card-body">
-                        <h2 className="card-title">ร้านข้าวมันไก่</h2>
-                        <p>คำแนะนำร้าน</p>
-                        <div className="justify-center">
-                          <div className="bg-[#DAFFE4] rounded-full p-2 mt-2 text-center font-bold">
-                            เริ่มต้น 35
-                          </div>
-                        </div>
+                    { filteredShop2.length === 0 ? (
+                      <div className="w-full rounded-box items-center bg-[#EDEDEDF0] flex justify-center p-10 text-black mb-5">
+                        <h1 className="text-sm lg:text-lg">ยังไม่มีร้านอาหาร</h1>
                       </div>
-                    </div>
+                    ) : (
+                      filteredShop2.map((shop: Shop) => (
+                          <div key={shop.shopID} className="card bg-base-300 w-64 flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-300 hover:cursor-pointer">
+                            <figure>
+                              <img
+                                src={shop.shopPic}
+                                alt="Shop" 
+                                className="w-full h-48 object-cover"
+                              />
+                            </figure>
+                            <div className="card-body">
+                              <h2 className="card-title">{shop.shopName}</h2>
+                              <p>{shop.shopDetail}</p>
+                              <div className="justify-center">
+                                <div className="bg-warning rounded-full p-2 mt-2 text-center font-bold">
+                                  สั่งเลย!
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      )
+                    )}
 
                   </div>
                   
@@ -183,7 +240,7 @@ export default function TestPage() {
                       <h2 className="m-3">🍜 เลือกร้านอาหารที่อยากสั่งได้เลย!</h2>
                     </div>
                     
-                    <div className="card bg-base-100 w-96 shadow-lg justify-center items-center mx-auto mt-5 hover:scale-105 transition-transform duration-300">
+                    <div onClick={() => setCafeterias("ตึก 80")} className="card bg-base-300 w-80 shadow-lg justify-center items-center mx-auto mt-5 hover:scale-105 transition-transform duration-300 hover:cursor-pointer">
                       <figure className="px-10 pt-10">
                         <img
                           src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
@@ -198,14 +255,12 @@ export default function TestPage() {
                           <p>เบอร์โทร: 099-999-999</p>
                         </div>
                         <div className="card-actions">
-                          <button className="btn btn-success text-white w-40"
-                          onClick={() => setCafeterias("ตึก 80")}
-                          >เลือก</button>
+                          <button className="btn btn-success text-white w-40">เลือก</button>
                         </div>
                       </div>
                     </div>
 
-                    <div className="card bg-base-100 w-96 shadow-lg justify-center items-center mx-auto mt-5 hover:scale-105 transition-transform duration-300">
+                    <div onClick={() => setCafeterias("บพิตรพิมุข")} className="card bg-base-300 w-80 shadow-lg justify-center items-center mx-auto mt-5 hover:scale-105 transition-transform duration-300 hover:cursor-pointer">
                       <figure className="px-10 pt-10">
                         <img
                           src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
@@ -240,29 +295,61 @@ export default function TestPage() {
                         <h2 className="m-3 text-green-800">เลือกร้านอาหารที่คุณต้องการ</h2>
                       </div>
                     </div>
+
+                    <label className="flex lg:hidden input items-center gap-2 flex-none mt-5">
+                        <svg
+                        className="h-[1em] opacity-50"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        >
+                        <g
+                            strokeLinejoin="round"
+                            strokeLinecap="round"
+                            strokeWidth="2.5"
+                            fill="none"
+                            stroke="currentColor"
+                        >
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.3-4.3"></path>
+                        </g>
+                        </svg>
+
+                        <input type="search" required placeholder="Search"
+                            value={query}
+                            onChange={handleSearch}/>
+                    </label>
           
                     {/* Scrollable Container */}
                     <div className="flex flex-col items-center p-5 space-y-5">
                       
                       {/* Card */}
-                      <div className="card bg-[#EAEAEA] w-70 flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-300">
-                        <figure>
-                          <img
-                            src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-                            alt="เมนู" 
-                            className="w-full h-48 object-cover"
-                          />
-                        </figure>
-                        <div className="card-body">
-                          <h2 className="card-title">ร้านข้าวมันไก่</h2>
-                          <p>คำแนะนำร้าน</p>
-                          <div className="justify-center">
-                            <div className="bg-[#DAFFE4] rounded-full p-2 mt-2 text-center font-bold hover:scale-115 transition-transform duration-300">
-                              สั่งเลย!
-                            </div>
-                          </div>
+                      { filteredShop1.length === 0 ? (
+                        <div className="w-full rounded-box items-center bg-[#EDEDEDF0] flex justify-center p-10 text-black mb-5">
+                          <h1 className="text-sm lg:text-lg">ยังไม่มีร้านอาหาร</h1>
                         </div>
-                      </div>
+                      ) : (
+                        filteredShop1.map((shop: Shop) => (
+                            <div key={shop.shopID} className="card bg-base-300 w-64 flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-300 hover:cursor-pointer">
+                              <figure>
+                                <img
+                                  src={shop.shopPic}
+                                  alt="Shop" 
+                                  className="w-full h-48 object-cover"
+                                />
+                              </figure>
+                              <div className="card-body">
+                                <h2 className="card-title">{shop.shopName}</h2>
+                                <p>{shop.shopDetail}</p>
+                                <div className="justify-center">
+                                  <div className="bg-warning rounded-full p-2 mt-2 text-center font-bold">
+                                    สั่งเลย!
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        )
+                      )}
 
                     </div>
                   </div>
@@ -278,29 +365,61 @@ export default function TestPage() {
                       <h1 className="text-2xl font-bold m-3 text-green-500">โรงอาหาร บพิตรพิมุข</h1>
                       <h2 className="m-3 text-green-800">เลือกร้านอาหารที่คุณต้องการ</h2>
                     </div>
+
+                    <label className="flex lg:hidden input items-center gap-2 flex-none mt-5">
+                        <svg
+                        className="h-[1em] opacity-50"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        >
+                        <g
+                            strokeLinejoin="round"
+                            strokeLinecap="round"
+                            strokeWidth="2.5"
+                            fill="none"
+                            stroke="currentColor"
+                        >
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.3-4.3"></path>
+                        </g>
+                        </svg>
+
+                        <input type="search" required placeholder="Search"
+                            value={query}
+                            onChange={handleSearch}/>
+                    </label>
           
                     {/* Scrollable Container */}
                     <div className="flex flex-col items-center p-5 space-y-5">
                       
                       {/* Card */}
-                      <div className="card bg-[#EAEAEA] w-70 flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-300">
-                        <figure>
-                          <img
-                            src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-                            alt="เมนู" 
-                            className="w-full h-48 object-cover"
-                          />
-                        </figure>
-                        <div className="card-body">
-                          <h2 className="card-title">ร้านข้าวมันไก่</h2>
-                          <p>คำแนะนำร้าน</p>
-                          <div className="justify-center">
-                            <div className="bg-[#DAFFE4] rounded-full p-2 mt-2 text-center font-bold hover:scale-115 transition-transform duration-300">
-                              สั่งเลย!
-                            </div>
-                          </div>
+                      { filteredShop2.length === 0 ? (
+                        <div className="w-full rounded-box items-center bg-[#EDEDEDF0] flex justify-center p-10 text-black mb-5">
+                          <h1 className="text-sm lg:text-lg">ยังไม่มีร้านอาหาร</h1>
                         </div>
-                      </div>
+                      ) : (
+                        filteredShop2.map((shop: Shop) => (
+                            <div key={shop.shopID} className="card bg-base-300 w-64 flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-300 hover:cursor-pointer">
+                              <figure>
+                                <img
+                                  src={shop.shopPic}
+                                  alt="Shop" 
+                                  className="w-full h-48 object-cover"
+                                />
+                              </figure>
+                              <div className="card-body">
+                                <h2 className="card-title">{shop.shopName}</h2>
+                                <p>{shop.shopDetail}</p>
+                                <div className="justify-center">
+                                  <div className="bg-warning rounded-full p-2 mt-2 text-center font-bold">
+                                    สั่งเลย!
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        )
+                      )}
 
                     </div>
                   </div>

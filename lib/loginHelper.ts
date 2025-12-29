@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 
 // Define return types
-type UserRole = "shop" | "user" | "admin";
+type UserRole = "shop" | "customer" | "admin";
 
 interface UserData {
   id: number;
@@ -23,7 +23,7 @@ export async function getCurrentUser(): Promise<AuthResult> {
         const session = await prisma.session.findUnique({
             where: { token },
             include: { 
-                user: true,
+                customer: true,
                 shop: true,
                 admin: true 
             },
@@ -45,11 +45,11 @@ export async function getCurrentUser(): Promise<AuthResult> {
                 name: session.shop.shopName || "",
                 email: session.shop.shopEmail || ""
             };
-        } else if (role === "user" && session.user) {
+        } else if (role === "customer" && session.customer) {
             userData = {
-                id: session.user.userID,
-                name: session.user.userFname + " " + session.user.userLname || "",
-                email: session.user.userEmail || ""
+                id: session.customer.customerID,
+                name: session.customer.customerFname + " " + session.customer.customerLname || "",
+                email: session.customer.customerEmail || ""
             };
         } else if (role === "admin" && session.admin) {
             userData = {

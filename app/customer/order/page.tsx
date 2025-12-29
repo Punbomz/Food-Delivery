@@ -11,7 +11,7 @@ type History = {
   shopLogout: string | null;
 };
 
-export default function ShopHistory() {
+export default function CustomerOrder() {
   const [history, setHistory] = useState<History[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [page, setPage] = useState(1);
@@ -19,33 +19,17 @@ export default function ShopHistory() {
   const [loadingPage, setLoadingPage] = useState(true);
 
   useEffect(() => {
-    getData();
+    fetch("/api/history/shop")
+      .then((res) => res.json())
+      .then((data) => {
+        setHistory(data);
+      });
+    setLoadingPage(false);
   }, []);
 
   useEffect(() => {
     setMaxPage(Math.ceil(filteredHistory.length/10));
   }, [history]);
-
-  const getData = async () => {
-    try {
-      const res = await fetch("/api/getdata/history", {
-        credentials: "include",
-      });
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        console.error("API error:", result);
-        return;
-      }
-
-      setHistory(result);
-    } catch (error) {
-      console.error("Fetch data failed:", error);
-    } finally {
-      setLoadingPage(false);
-    }
-  };
 
   const filteredHistory = selectedDate
     ? history.filter((item) => {

@@ -4,50 +4,103 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-  const data = await request.json();
+  try {
+    const data = await request.json();
+    const cookieStore = await cookies();
 
-  let user;
+    const id =
+      data.role === "shop"
+        ? Number(cookieStore.get("shopId")?.value)
+        : Number(cookieStore.get("customerId")?.value);
 
-  if(data.role === "shop") {
-    user = await prisma.shop.findUnique({
-        where: { shopID: data.id },
-    });
-
-    if (!user) {
+    if (!id || Number.isNaN(id)) {
       return NextResponse.json(
-        { message: "Shop not found" },
-        { status: 404 }
+        { message: "Unauthorized" },
+        { status: 401 }
       );
     }
 
-    const isMatch = await bcrypt.compare(data.oldPassword, user.shopPass);
+    if (data.role === "shop") {
+      const user = await prisma.shop.findUnique({
+        where: { shopID: id },
+      });
 
-    if (!isMatch) {
-        return Response.json(
-        { message: "รหัสผ่านไม่ถูกต้อง!" },
-        { status: 401 }
-        );
-    }
-
-    const hashedPassword = await bcrypt.hash(data.newPassword, 10);
-
-    try {
-    await prisma.shop.update({
-      where: { shopID: data.id },
-      data: {
-        shopPass: hashedPassword,
-      },
-    });
-    } catch (error) {
+      if (!user || !user.shopPass) {
         return NextResponse.json(
-            { message: "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง!" },
-            { status: 409 }
+          { message: "Shop not found" },
+          { status: 404 }
         );
-    }
-  }
+      }
 
-  return Response.json(
-    { message: "บันทึกข้อมูลสำเร็จ!" },
-    { status: 200 }
-  );
+      const isMatch = await bcrypt.compare(
+        data.oldPassword,
+        user.shopPass
+      );
+
+      if (!isMatch) {
+        return NextResponse.json(
+          { message: "รหัสผ่านไม่ถูกต้อง!" },
+          { status: 401 }
+        );
+      }
+
+      const hashedPassword = await bcrypt.hash(data.newPassword, 10);
+
+      await prisma.shop.update({
+        where: { shopID: id },
+        data: { shopPass: hashedPassword },
+      });
+    }
+
+    else if (data.role === "customer") {
+
+      const user = await prisma.customer.findUnique({
+        where: { customerID: id },
+      });
+
+      if (!user || !user.customerPass) {
+        return NextResponse.json(
+          { message: "Customer not found" },
+          { status: 404 }
+        );
+      }
+
+      const isMatch = await bcrypt.compare(
+        data.oldPassword,
+        user.customerPass
+      );
+
+      if (!isMatch) {
+        return NextResponse.json(
+          { message: "รหัสผ่านไม่ถูกต้อง!" },
+          { status: 401 }
+        );
+      }
+
+      const hashedPassword = await bcrypt.hash(data.newPassword, 10);
+
+      await prisma.customer.update({
+        where: { customerID: id },
+        data: { customerPass: hashedPassword },
+      });
+    }
+
+    else {
+      return NextResponse.json(
+        { message: "Invalid role" },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json(
+      { message: "บันทึกข้อมูลสำเร็จ!" },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("changePass error:", error);
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
 }

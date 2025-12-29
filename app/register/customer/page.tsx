@@ -8,7 +8,7 @@ import { useAlertModal } from "@/app/hooks/useAlertModal";
 
 export default function customerRegister() {
   const router = useRouter();
-  const { message, navigateTo, showAlert, closeAlert } = useAlertModal();
+  const { isOpen, message, navigateTo, showAlert, closeAlert } = useAlertModal();
 
   const [pass, setPass] = useState("");
   const [passConfirm, setPassConfirm] = useState("");
@@ -56,6 +56,7 @@ export default function customerRegister() {
   return (
     <>
       <AlertModal
+        isOpen={isOpen}
         message={message}
         navigateTo={navigateTo}
         onClose={closeAlert}

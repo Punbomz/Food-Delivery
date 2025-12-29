@@ -13,19 +13,6 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  userID     Int     @id @default(autoincrement())
-  userFname  String
-  userLname  String
-  userGender String
-  userEmail  String  @unique
-  userPhone  String
-  userPass   String
-  userPic    String?
-
-  sessions Session[]
-}
-
 model Shop {
   shopID        Int     @id @default(autoincrement())
   shopFname     String
@@ -69,9 +56,11 @@ model Customer {
   customerEmail String  @unique
   customerPhone String
   customerPass  String
+  customerGender  String
   customerPic   String?
 
   sessions Session[]
+  history  CustomerHistory[]
 }
 
 model Session {
@@ -79,9 +68,6 @@ model Session {
   token     String   @unique
   expiresAt DateTime
   createdAt DateTime @default(now())
-  
-  userId    Int?
-  user      User?    @relation(fields: [userId], references: [userID], onDelete: Cascade)
   
   shopId    Int?
   shop      Shop?    @relation(fields: [shopId], references: [shopID], onDelete: Cascade)
@@ -93,7 +79,6 @@ model Session {
   customer     Customer?   @relation(fields: [customerId], references: [customerID], onDelete: Cascade)
 
   @@index([token])
-  @@index([userId])
   @@index([shopId])
   @@index([adminId])
   @@index([customerId])
@@ -106,6 +91,15 @@ model ShopHistory {
   shopLogout    DateTime?
 
   shop      Shop     @relation(fields: [shopID], references: [shopID])
+}
+
+model CustomerHistory {
+  customerHistoryID Int @id @default(autoincrement())
+  customerID    Int
+  customerLogin     DateTime
+  customerLogout    DateTime?
+
+  customer      Customer     @relation(fields: [customerID], references: [customerID])
 }
 
 model Food {

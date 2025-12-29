@@ -2,16 +2,15 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Sidebar } from "../../components/sidebar"
 import Skeleton from "@/app/components/Skeleton";
 
 type History = {
-  shopHistoryID: number;
-  shopLogin: string;
-  shopLogout: string | null;
+  customerHistoryID: number;
+  customerLogin: string;
+  customerLogout: string | null;
 };
 
-export default function ShopHistory() {
+export default function CustomerHistory() {
   const [history, setHistory] = useState<History[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [page, setPage] = useState(1);
@@ -49,7 +48,7 @@ export default function ShopHistory() {
 
   const filteredHistory = selectedDate
     ? history.filter((item) => {
-        const loginDate = new Date(item.shopLogin)
+        const loginDate = new Date(item.customerLogin)
           .toISOString()
           .split("T")[0];
         return loginDate === selectedDate;
@@ -60,12 +59,8 @@ export default function ShopHistory() {
     <>
       <div className="p-15">
       <div className="flex gap-10 justify-center text-2xl">
-      {/* Side Bar */}
-          < Sidebar />
-          
       {/* Content */}
-      <div className="flex-3/4 shadow-lg rounded-box p-20 bg-white justify-center">
-
+      <div className="flex flex-col shadow-lg rounded-box p-20 bg-white justify-center">
         { loadingPage ? (
           <Skeleton />
         ) : (
@@ -125,9 +120,9 @@ export default function ShopHistory() {
                 {filteredHistory
                   .slice((page - 1) * 10, page * 10)
                   .map((item) => (
-                    <div key={item.shopHistoryID}>
+                    <div key={item.customerHistoryID}>
                       <p className="text-sm mb-2 w-sm lg:w-lg mx-auto">
-                        {new Date(item.shopLogin).toLocaleDateString("th-TH", {
+                        {new Date(item.customerLogin).toLocaleDateString("th-TH", {
                           weekday: "long",
                           day: "numeric",
                           month: "long",
@@ -137,16 +132,16 @@ export default function ShopHistory() {
 
                       <div className="bg-base-300 border rounded px-3 py-2 mb-2 w-sm lg:w-lg mx-auto text-sm">
                         เข้าใช้งานเวลา{" "}
-                        {new Date(item.shopLogin).toLocaleTimeString("th-TH", {
+                        {new Date(item.customerLogin).toLocaleTimeString("th-TH", {
                           hour: "2-digit",
                           minute: "2-digit",
                         })}
                       </div>
 
                       <div className="bg-base-300 border rounded px-3 py-2 w-sm lg:w-lg mx-auto text-sm">
-                        {item.shopLogout
+                        {item.customerLogout
                           ? `ออกจากระบบเวลา ${new Date(
-                              item.shopLogout
+                              item.customerLogout
                             ).toLocaleTimeString("th-TH", {
                               hour: "2-digit",
                               minute: "2-digit",
