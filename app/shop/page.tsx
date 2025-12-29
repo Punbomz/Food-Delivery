@@ -19,6 +19,7 @@ interface User {
     shopEmail: string;
     shopPhone: string;
     shopName: string;
+    shopDetail: string;
     shopLocation: string;
     shopPic: string;
     shopQR: string;
@@ -332,6 +333,12 @@ export default function shopProfile() {
                           <legend className="fieldset-legend">ชื่อร้าน</legend>
                           <div>
                             <input name="Name" defaultValue={user?.shopName || ""} type="text" className="input w-full" placeholder="ระบุชื่อร้าน" required disabled={!isEditing} />
+                          </div>
+                        </div>
+                        <div className="space-y-2 w-xs mx-auto">
+                          <legend className="fieldset-legend">คำอธิบายร้านค้า</legend>
+                          <div>
+                            <textarea name="Detail" defaultValue={user?.shopDetail || ""} className="textarea w-full" placeholder="ระบุคำอธิบายร้านค้า" maxLength={100} disabled={!isEditing}></textarea>
                           </div>
                         </div>
                         <div className="space-y-2 w-xs mx-auto">

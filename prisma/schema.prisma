@@ -35,6 +35,7 @@ model Shop {
   shopPhone     String
   shopPass      String
   shopName      String
+  shopDetail  String?
   shopLocation  String
   shopPic       String?
   shopQR        String?
