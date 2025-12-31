@@ -112,8 +112,10 @@ model Food {
   foodGenreID Int
   foodOptions Int[]
   foodStatus Boolean @default(true)
+  optionGroups  OptionGroup[]
 
   shop  Shop  @relation(fields: [shopID], references: [shopID])
+  genre       FoodGenre @relation(fields: [foodGenreID], references: [fGenreID])
 }
 
 model FoodGenre {
@@ -122,6 +124,7 @@ model FoodGenre {
   shopID  Int
 
   shop  Shop  @relation(fields: [shopID], references: [shopID])
+  foods      Food[]
 }
 
 model OptionGroup {
@@ -132,6 +135,7 @@ model OptionGroup {
   shopID Int
 
   option Option[]
+  foods       Food[]
 
   shop  Shop  @relation(fields: [shopID], references: [shopID])
 }
