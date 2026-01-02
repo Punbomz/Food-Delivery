@@ -30,6 +30,12 @@ export async function POST(request: Request) {
             foodID: id,
           },
         });
+
+        await prisma.foodOptionGroup.deleteMany({
+          where: {
+            foodID: id,
+          },
+        })
     } catch(error) {
         return NextResponse.json(
         { message: "Delete food error!" },

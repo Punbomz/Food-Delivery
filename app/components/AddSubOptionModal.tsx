@@ -69,7 +69,7 @@ export default function AddSubOption({ modalRef, id, data, info, onSuccess }: Pr
                     <div className="w-xs">
                         <legend className="fieldset-legend">ราคา</legend>
                         <input name="Price" type="number" className="input" placeholder="ระบุราคา" step="0.01" required
-                        min={1}
+                        min={0}
                         value={price}
                         onChange={(e) => setPrice(e.target.value)}/>
                     </div>

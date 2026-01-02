@@ -5,6 +5,8 @@ import Skeleton2 from "./components/Skeleton2";
 import AlertModal from "@/app/components/AlertModal";
 import { useAlertModal } from "@/app/hooks/useAlertModal";
 import { useRouter, useSearchParams } from "next/navigation";
+import ConfirmModal from '@/app/components/ConfirmModal';
+import { useConfirmModal } from "@/app/hooks/useConfirmModal";
 
 interface Shop {
   shopID: number;
@@ -24,12 +26,24 @@ export default function PageClient() {
     const scrollRef2 = useRef<HTMLDivElement>(null);
     const [loadingPage, setLoadingPage] = useState(true);
     const { isOpen, message, navigateTo, showAlert, closeAlert } = useAlertModal();
+    const [hasToken, setToken] = useState(false);
 
     const router = useRouter();
     const searchParams = useSearchParams();
     const query = searchParams.get("srch")?.toLowerCase() || "";
 
     const [shops, setShop] = useState<Shop[]>([]);
+
+    const { 
+        isOpen: isConfirmOpen, 
+        message: confirmMessage,
+        title: confirmTitle,
+        confirmText,
+        cancelText,
+        showConfirm, 
+        handleConfirm, 
+        handleCancel 
+    } = useConfirmModal();
 
     useEffect(() => {
         getData();
@@ -76,6 +90,7 @@ export default function PageClient() {
     const getData = async () => {
         try {
         const res = await fetch("/api/getdata/shop", {
+          credentials: 'include',
             method: "POST",
             headers: {
             "Content-Type": "application/json",
@@ -84,7 +99,8 @@ export default function PageClient() {
 
         if (res.ok) {
             const data = await res.json();
-            setShop(data);
+            setShop(data.shop);
+            setToken(data.token);
             setLoadingPage(false);
         }
         } catch(error) {
@@ -125,6 +141,16 @@ export default function PageClient() {
         onClose={closeAlert}
       />
 
+      <ConfirmModal
+          isOpen={isConfirmOpen}
+          title={confirmTitle}
+          message={confirmMessage}
+          confirmText={confirmText}
+          cancelText={cancelText}
+          onConfirm={handleConfirm}
+          onCancel={handleCancel}
+      />
+
       { loadingPage ? (
         <Skeleton2 />
       ) : (
@@ -152,7 +178,16 @@ export default function PageClient() {
                       </div>
                     ) : (
                       filteredShop1.map((shop: Shop) => (
-                          <div key={shop.shopID} className="card bg-base-300 w-64 flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-300 hover:cursor-pointer">
+                          <div key={shop.shopID} className="card bg-base-300 w-64 flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-300 hover:cursor-pointer"
+                            onClick={() => hasToken ? 
+                              router.push(`/shop/${shop.shopID}`) :
+                              showConfirm(
+                                "กรุณาเข้าสู่ระบบ!",
+                                async () => {
+                                  router.push('/login/customer');
+                                }
+                              )
+                          }>
                             <figure>
                               <img
                                 src={shop.shopPic}
@@ -200,7 +235,16 @@ export default function PageClient() {
                       </div>
                     ) : (
                       filteredShop2.map((shop: Shop) => (
-                          <div key={shop.shopID} className="card bg-base-300 w-64 flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-300 hover:cursor-pointer">
+                          <div key={shop.shopID} className="card bg-base-300 w-64 flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-300 hover:cursor-pointer"
+                            onClick={() => hasToken ? 
+                              router.push(`/shop/${shop.shopID}`) :
+                              showConfirm(
+                                "กรุณาเข้าสู่ระบบ!",
+                                async () => {
+                                  router.push('/login/customer');
+                                }
+                              )
+                          }>
                             <figure>
                               <img
                                 src={shop.shopPic}
@@ -324,7 +368,16 @@ export default function PageClient() {
                         </div>
                       ) : (
                         filteredShop1.map((shop: Shop) => (
-                            <div key={shop.shopID} className="card bg-base-300 w-64 flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-300 hover:cursor-pointer">
+                            <div key={shop.shopID} className="card bg-base-300 w-64 flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-300 hover:cursor-pointer"
+                              onClick={() => hasToken ? 
+                              router.push(`/shop/${shop.shopID}`) :
+                              showConfirm(
+                                "กรุณาเข้าสู่ระบบ!",
+                                async () => {
+                                  router.push('/login/customer');
+                                }
+                              )
+                            }>
                               <figure>
                                 <img
                                   src={shop.shopPic}
@@ -389,7 +442,16 @@ export default function PageClient() {
                         </div>
                       ) : (
                         filteredShop2.map((shop: Shop) => (
-                            <div key={shop.shopID} className="card bg-base-300 w-64 flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-300 hover:cursor-pointer">
+                            <div key={shop.shopID} className="card bg-base-300 w-64 flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-300 hover:cursor-pointer"
+                              onClick={() => hasToken ? 
+                              router.push(`/shop/${shop.shopID}`) :
+                              showConfirm(
+                                "กรุณาเข้าสู่ระบบ!",
+                                async () => {
+                                  router.push('/login/customer');
+                                }
+                              )
+                            }>
                               <figure>
                                 <img
                                   src={shop.shopPic}

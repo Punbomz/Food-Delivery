@@ -8,8 +8,8 @@ export async function POST(request: Request) {
 
     if (!id) {
         return NextResponse.json(
-        { message: "Invalid food id" },
-        { status: 400 }
+            { message: "Invalid food id" },
+            { status: 400 }
         );
     }
 
@@ -18,7 +18,17 @@ export async function POST(request: Request) {
             where: { foodID: id },
         });
 
-        return NextResponse.json(food, { status: 200 });
+        const optionsID = await prisma.foodOptionGroup.findMany({
+            where: { foodID: id },
+            select: { ogID: true },
+        });
+
+        let options: number[] = [];
+        optionsID.map((item) => (
+            options.push(item.ogID)
+        ))
+
+        return NextResponse.json({ food, options }, { status: 200 });
 
     } catch (error) {
         console.error("Fetch food data error:", error);

@@ -57,6 +57,12 @@ export async function POST(request: Request) {
             picUrl = oldFood?.foodPic as string;
         }
 
+        await prisma.foodOptionGroup.deleteMany({
+          where: {
+            foodID: id,
+          },
+        })
+
         await prisma.food.update({
             where: {
                 foodID: id,
@@ -67,9 +73,17 @@ export async function POST(request: Request) {
                 foodDetails: formData.get("Details") as string,
                 foodPrice: Number(formData.get("Price")),
                 foodGenreID: Number(formData.get("Genre")),
-                foodOptions: Options,
             },
         })
+
+        Options.map(async (item) => (
+            await prisma.foodOptionGroup.create({
+                data: {
+                    foodID: id,
+                    ogID: item,
+                },
+            })
+        ));
     } catch(error) {
         return NextResponse.json(
             null,

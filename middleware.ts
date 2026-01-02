@@ -1,39 +1,36 @@
-// middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export async function middleware(request: NextRequest) {
-
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  
-  // Get session token and role from cookies
+
   const token = request.cookies.get("session")?.value;
   const role = request.cookies.get("role")?.value;
 
-  // Define default dashboards for each role
   const dashboards = {
     shop: "/shop",
     customer: "/",
-    admin: "/admin"
+    admin: "/admin",
   };
 
-  // Define route types
-  const isProtectedRoute = 
-    pathname.startsWith("/shop") || 
-    pathname.startsWith("/admin") || 
+  const isProtectedRoute =
+    pathname.startsWith("/shop") ||
+    pathname.startsWith("/admin") ||
     pathname.startsWith("/customer");
 
-  const isAuthRoute = 
-    pathname.startsWith("/login") || 
+  const isAuthRoute =
+    pathname.startsWith("/login") ||
     pathname.startsWith("/register");
 
   const isHomePage = pathname === "/";
 
-  // No session - only allow access to auth routes and home
+  // shop detail page
+  const isShopDetailPage =
+    pathname.startsWith("/shop/") &&
+    pathname !== "/shop"
+
+  /* ---------- ไม่มี session ---------- */
   if (!token) {
-    if (pathname === "/login/shop" || pathname === "/login/admin" || pathname === "/login/customer") {
-      return NextResponse.next();
-    }
     if (isProtectedRoute) {
       const res = NextResponse.redirect(new URL("/", request.url));
       res.cookies.delete("session");
@@ -43,6 +40,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  /* ---------- session พัง ---------- */
   if (token && !role) {
     const res = NextResponse.redirect(new URL("/", request.url));
     res.cookies.delete("session");
@@ -50,40 +48,40 @@ export async function middleware(request: NextRequest) {
     return res;
   }
 
-  // Has session - redirect to appropriate dashboard
+  /* ---------- มี session ---------- */
   if (token && role) {
-    const userDashboard = dashboards[role as keyof typeof dashboards];
+    const dashboard = dashboards[role as keyof typeof dashboards];
 
-    // PREVENT REDIRECT LOOPS: Don't redirect if already at destination
-    if (pathname === userDashboard) {
-      return NextResponse.next();
+    if (isHomePage && role !== "customer") {
+      return NextResponse.redirect(new URL(dashboard, request.url));
     }
 
-    // Redirect from home page to user's dashboard
-    if (isHomePage) {
-      return NextResponse.redirect(new URL(userDashboard, request.url));
-    }
-
-    // Logged-in users should not access login/register pages
     if (isAuthRoute) {
-      return NextResponse.redirect(new URL(userDashboard, request.url));
+      return NextResponse.redirect(new URL(dashboard, request.url));
     }
 
-    // Role-based access control for protected routes
     if (isProtectedRoute) {
-      // Customer trying to access shop/admin
-      if (role === "user" && !pathname.startsWith("/customer")) {
-        return NextResponse.redirect(new URL(dashboards.customer, request.url));
+      // customer
+      if (role === "customer") {
+        if (
+          pathname.startsWith("/customer") ||
+          isShopDetailPage ||
+          pathname === "/"
+        ) {
+          return NextResponse.next();
+        }
+
+        return NextResponse.redirect(new URL("/", request.url));
       }
 
-      // Shop trying to access admin/customer
+      // shop
       if (role === "shop" && !pathname.startsWith("/shop")) {
-        return NextResponse.redirect(new URL(dashboards.shop, request.url));
+        return NextResponse.redirect(new URL("/shop", request.url));
       }
 
-      // Admin trying to access shop/customer
+      // admin
       if (role === "admin" && !pathname.startsWith("/admin")) {
-        return NextResponse.redirect(new URL(dashboards.admin, request.url));
+        return NextResponse.redirect(new URL("/admin", request.url));
       }
     }
   }
@@ -94,13 +92,10 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     "/",
-    "/shop/:path*", 
-    "/admin/:path*", 
-    "/customer/:path*", 
+    "/shop/:path*",
+    "/admin/:path*",
+    "/customer/:path*",
     "/login/:path*",
     "/register/:path*",
-    "/login/shop",
-    "/login/admin",
-    "/login/customer"
   ],
 };

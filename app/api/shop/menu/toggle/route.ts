@@ -19,7 +19,7 @@ export async function POST(request: Request) {
             foodID: id,
         },
         data: {
-            foodStatus: status,
+            foodStatus: !status,
         },
     })
 

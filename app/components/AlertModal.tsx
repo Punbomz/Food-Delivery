@@ -14,8 +14,10 @@ export default function AlertModal({ isOpen, message, onClose, navigateTo }: Ale
 
   const handleClose = () => {
     onClose();
-    if (navigateTo) {
+    if (navigateTo && navigateTo !== "back") {
       window.location.replace(navigateTo);
+    } else if (navigateTo === "back") {
+      router.back();
     }
   };
 

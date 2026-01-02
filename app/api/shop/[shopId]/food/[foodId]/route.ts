@@ -1,30 +1,50 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
-export async function GET(req: Request, { params }: { params: { shopId: string; foodId: string } }) {
-  const foodId = parseInt(params.foodId);
+export async function GET(
+  req: Request,
+  context: { params: Promise<{ shopId: string; foodId: string }> }
+) {
+  const { foodId } = await context.params;
+  const id = Number(foodId);
+
+  if (isNaN(id)) {
+    return NextResponse.json(
+      { message: "Invalid foodId" },
+      { status: 400 }
+    );
+  }
 
   const food = await prisma.food.findUnique({
-    where: { foodID: foodId },
-    select: {
-      foodID: true,
-      foodName: true,
-      foodDetails: true,
-      foodPrice: true,
-      foodPic: true,
-      optionGroups: {
-        select: {
-          ogID: true,
-          ogName: true,
-          ogMultiple: true,
-          ogForce: true,
-          option: { select: { opID: true, opName: true, opPrice: true } },
+    where: { foodID: id },
+    include: {
+      foodOptionGroups: {
+        include: {
+          optionGroup: {
+            include: {
+              options: true,
+            },
+          },
         },
       },
     },
   });
 
-  if (!food) return NextResponse.json({ message: "Food not found" }, { status: 404 });
+  if (!food) {
+    return NextResponse.json(
+      { message: "Food not found" },
+      { status: 404 }
+    );
+  }
 
-  return NextResponse.json(food);
+  const result = {
+    foodID: food.foodID,
+    foodName: food.foodName,
+    foodDetails: food.foodDetails,
+    foodPrice: food.foodPrice,
+    foodPic: food.foodPic,
+    optionGroups: food.foodOptionGroups.map((fog) => fog.optionGroup),
+  };
+
+  return NextResponse.json(result);
 }

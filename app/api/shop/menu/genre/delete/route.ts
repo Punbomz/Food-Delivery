@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { del } from "@vercel/blob";
 
 export async function POST(request: Request) {
   try {
@@ -13,26 +14,58 @@ export async function POST(request: Request) {
       );
     }
 
-    try {
-        await prisma.foodGenre.delete({
+    await prisma.$transaction(async (tx) => {
+      const foods = await tx.food.findMany({
+        where: {
+          foodGenreID: id,
+        },
+        select: {
+          foodID: true,
+          foodPic: true,
+        },
+      });
+
+      if (foods) {
+        foods.map(async (food) => (
+          await del(food.foodPic)
+        ))
+      }
+
+      const foodIDs = foods.map(f => f.foodID);
+
+      if (foodIDs.length > 0) {
+        await tx.foodOptionGroup.deleteMany({
           where: {
-            fGenreID: id,
+            foodID: { in: foodIDs },
           },
         });
-    } catch(error) {
-        return NextResponse.json(
+      }
+
+      await tx.food.deleteMany({
+        where: {
+          foodGenreID: id,
+        },
+      });
+
+      await tx.foodGenre.delete({
+        where: {
+          fGenreID: id,
+        },
+      });
+    });
+
+    return NextResponse.json(null, { status: 200 });
+
+  } catch (error: any) {
+    console.error("Delete genre error:", error);
+
+    if (error.code === "P2025") {
+      return NextResponse.json(
         { message: "Genre not found" },
         { status: 404 }
-        );
+      );
     }
 
-    return NextResponse.json(
-      null,
-      { status: 200 }
-    );
-
-  } catch (error) {
-    console.error("Delete genre error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }

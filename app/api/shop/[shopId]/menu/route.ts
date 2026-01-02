@@ -1,32 +1,44 @@
 import { prisma } from "@/lib/prisma";
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextResponse } from "next/server";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { shopId } = req.query;
-  if (!shopId || typeof shopId !== "string") return res.status(400).json({ message: "Invalid shopId" });
+type Params = {
+  params: Promise<{
+    shopId: string;
+  }>;
+};
+
+export async function GET(
+  req: Request,
+  { params }: Params
+) {
+  const { shopId } = await params;
+
+  const shopIdNum = Number(shopId);
+  if (isNaN(shopIdNum)) {
+    return NextResponse.json(
+      { message: "Invalid shopId" },
+      { status: 400 }
+    );
+  }
 
   const shop = await prisma.shop.findUnique({
-    where: { shopID: parseInt(shopId) },
-    select: {
-      shopName: true,
-      shopPic: true,
-      shopOpen: true,
+    where: { shopID: shopIdNum },
+    include: {
       foods: {
         where: { foodStatus: true },
-        select: {
-          foodID: true,
-          foodName: true,
-          foodDetails: true,
-          foodPrice: true,
-          foodPic: true,
-          genre: { select: { fGenreName: true } },
-          optionGroups: {
+        include: {
+          genre: {
             select: {
-              ogID: true,
-              ogName: true,
-              ogMultiple: true,
-              ogForce: true,
-              option: { select: { opID: true, opName: true, opPrice: true } },
+              fGenreName: true,
+            },
+          },
+          foodOptionGroups: {
+            include: {
+              optionGroup: {
+                include: {
+                  options: true,
+                },
+              },
             },
           },
         },
@@ -34,20 +46,39 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     },
   });
 
-  if (!shop) return res.status(404).json({ message: "Shop not found" });
+  if (!shop) {
+    return NextResponse.json(
+      { message: "Shop not found" },
+      { status: 404 }
+    );
+  }
 
-  // Group foods by category
+  // group foods by genre
   const categories: Record<string, any[]> = {};
+
   shop.foods.forEach((food) => {
-    const catName = food.genre?.fGenreName || "อื่น ๆ";
-    if (!categories[catName]) categories[catName] = [];
-    categories[catName].push(food);
+    const categoryName = food.genre?.fGenreName ?? "อื่น ๆ";
+
+    if (!categories[categoryName]) {
+      categories[categoryName] = [];
+    }
+
+    categories[categoryName].push({
+      ...food,
+      optionGroups: food.foodOptionGroups.map((fog) => fog.optionGroup),
+    });
   });
 
-  res.json({
+  return NextResponse.json({
     shopName: shop.shopName,
+    shopDetail: shop.shopDetail,
     shopPic: shop.shopPic,
     shopOpen: shop.shopOpen,
-    categories: Object.entries(categories).map(([categoryName, foods]) => ({ categoryName, foods })),
+    categories: Object.entries(categories).map(
+      ([categoryName, foods]) => ({
+        categoryName,
+        foods,
+      })
+    ),
   });
 }
