@@ -43,7 +43,7 @@ export async function POST(request: Request) {
             }
         }
 
-        await prisma.food.create({
+        const food = await prisma.food.create({
             data: {
                 shopID: user.id,
                 foodPic: picUrl,
@@ -51,9 +51,17 @@ export async function POST(request: Request) {
                 foodDetails: formData.get("Details") as string,
                 foodPrice: Number(formData.get("Price")),
                 foodGenreID: Number(formData.get("Genre")),
-                foodOptions: Options,
             },
-        })
+        });
+
+        Options.map(async (item) => (
+            await prisma.foodOptionGroup.create({
+                data: {
+                    foodID: food.foodID,
+                    ogID: item,
+                },
+            })
+        ));
     } catch(error) {
         return NextResponse.json(
             null,

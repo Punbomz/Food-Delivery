@@ -21,11 +21,11 @@ export async function POST(request: Request) {
 
     const data = await Promise.all(
       opGroup.map(async (item) => {
-        const ogFood = await prisma.food.count({
+        const ogFood = await prisma.foodOptionGroup.count({
           where: {
-            shopID: user.id,
-            foodOptions: {
-                hasSome: [Number(item.ogID)],
+            optionGroup: {
+              ogID: item.ogID,
+              shopID: user.id,
             },
           },
         });

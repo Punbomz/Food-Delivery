@@ -89,4 +89,7 @@ export async function clearSession() {
     // Clear cookies
     cookieStore.delete("session");
     cookieStore.delete("role");
+    cookieStore.delete("customerId");
+    cookieStore.delete("shopId");
+    cookieStore.delete("adminId");
 }

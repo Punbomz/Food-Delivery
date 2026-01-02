@@ -1,8 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
 export async function POST(request: Request) {
   try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("session")?.value;
     const shop = await prisma.shop.findMany();
 
     if (!shop) {
@@ -12,10 +15,17 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.json(
-      shop,
-      { status: 200 }
-    );
+    if(token) {
+      return NextResponse.json(
+        { shop: shop, token: true},
+        { status: 200 }
+      );
+    } else {
+      return NextResponse.json(
+        { shop: shop, token: false},
+        { status: 200 }
+      );
+    }
 
   } catch (error) {
     console.error("Fetch shop data error:", error);

@@ -54,7 +54,6 @@ export default function shopMenu() {
   const [shopID, setID] = useState<number | null>(null);
   const [foods, setFoods] = useState<Food[]>([]);
   const [genre, setGenre] = useState<Genre[]>([]);
-  const [isEditing, setEdit] = useState(false);
   const [status, setStatus] = useState<Status[]>([]);
   const [isUpdating, setUpdate] = useState(false);
   const [openToggle, setOpenToggle] = useState<Record<number, boolean>>({});
@@ -209,6 +208,7 @@ export default function shopMenu() {
   }
 
   const toggleStatus = async (foodID: number) => {
+    setUpdate(true);
     setStatus(prev =>
       prev.map(s =>
         s.foodID === foodID
@@ -221,10 +221,9 @@ export default function shopMenu() {
       await fetch("/api/shop/menu/toggle", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: foodID }),
+        body: JSON.stringify({ id: foodID, status: status.find(s => s.foodID === foodID)?.status ?? false }),
       });
     } catch {
-      // rollback ถ้าล้มเหลว
       setStatus(prev =>
         prev.map(s =>
           s.foodID === foodID
@@ -233,6 +232,7 @@ export default function shopMenu() {
         )
       );
     }
+    setUpdate(false);
   };
 
   const deleteGenre = async (genreID: number, genreName: string) => {
@@ -252,12 +252,13 @@ export default function shopMenu() {
 
             if(res.ok) {
               getData();
+              showAlert("ลบหมวดหมู่สำเร็จ!");
+            } else {
+              showAlert("เกิดข้อผิดพลาดในการลบหมวดหมู่!");
             }
           } catch (error) {
             showAlert("เกิดข้อผิดพลาดในการลบหมวดหมู่!");
           }
-
-          showAlert("ลบหมวดหมู่สำเร็จ!");
       },
     );
   }
@@ -333,7 +334,12 @@ export default function shopMenu() {
           if (selectedType === 1) {
             genreRef.current?.showModal();
           } else if(selectedType === 2) {
-            foodRef.current?.showModal();
+            if(genre.length > 0) {
+              foodRef.current?.showModal();
+            } else {
+              showAlert("กรุณาเพิ่มหมวดหมู่อาหาร!");
+              setSelectedType(1);
+            }
           }
         }}
       />
@@ -547,7 +553,7 @@ export default function shopMenu() {
                   ) : (
                     optionData.map((option: OptionData, index: number) => (
                       <div key={option.ogID}>
-                        <div className="w-full rounded-box items-center bg-accent-content flex justify-between p-3 text-black mb-5">
+                        <label className="w-full rounded-box items-center bg-accent-content flex justify-between p-3 text-black mb-5 hover:cursor-pointer">
                           <div>
                             <h1 className="text-sm lg:text-lg">{option.ogName}</h1>
                             <p className="text-sm">ใช้กับ {option.ogFood} รายการ</p>
@@ -575,7 +581,7 @@ export default function shopMenu() {
                                 </svg>
                             </button>
                           </div>
-                        </div>
+                        </label>
                         {openToggle2[option.ogID] && (
                           option.ogItem.length === 0 ? (
                             <div className="w-full rounded-box items-center bg-[#EDEDEDF0] flex justify-center p-10 text-black mb-5">

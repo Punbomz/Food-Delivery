@@ -34,7 +34,8 @@ model Shop {
   sessions Session[]
   foods    Food[]
   foodgenre FoodGenre[]
-  optiongroup OptionGroup[]
+  optionGroups  OptionGroup[]
+  cart  Cart[]
 }
 
 model Admin {
@@ -61,6 +62,7 @@ model Customer {
 
   sessions Session[]
   history  CustomerHistory[]
+  cart  Cart[]
 }
 
 model Session {
@@ -103,17 +105,20 @@ model CustomerHistory {
 }
 
 model Food {
-  foodID  Int @id @default(autoincrement())
-  shopID  Int
-  foodName  String
-  foodDetails String
-  foodPrice Float
-  foodPic String
-  foodGenreID Int
-  foodOptions Int[]
-  foodStatus Boolean @default(true)
+  foodID       Int @id @default(autoincrement())
+  shopID       Int
+  foodName     String
+  foodDetails  String?
+  foodPrice    Float
+  foodPic      String
+  foodGenreID  Int
+  foodStatus   Boolean @default(true)
 
-  shop  Shop  @relation(fields: [shopID], references: [shopID])
+  foodOptionGroups FoodOptionGroup[]
+  cartItem  CartItem[]
+
+  shop   Shop      @relation(fields: [shopID], references: [shopID])
+  genre  FoodGenre @relation(fields: [foodGenreID], references: [fGenreID])
 }
 
 model FoodGenre {
@@ -122,25 +127,90 @@ model FoodGenre {
   shopID  Int
 
   shop  Shop  @relation(fields: [shopID], references: [shopID])
+  foods      Food[]
 }
 
 model OptionGroup {
-  ogID  Int @id @default(autoincrement())
-  ogName  String
-  ogMultiple  Boolean
-  ogForce Boolean
-  shopID Int
+  ogID       Int @id @default(autoincrement())
+  shopID     Int
 
-  option Option[]
+  ogName     String
+  ogMultiple Boolean
+  ogForce    Boolean
 
-  shop  Shop  @relation(fields: [shopID], references: [shopID])
+  options    Option[]
+  foodOptionGroups FoodOptionGroup[]
+
+  shop Shop @relation(fields: [shopID], references: [shopID])
+
+  @@unique([shopID, ogName])
 }
 
+model FoodOptionGroup {
+  foodID Int
+  ogID   Int
+
+  food Food @relation(fields: [foodID], references: [foodID], onDelete: Cascade)
+  optionGroup OptionGroup @relation(fields: [ogID], references: [ogID], onDelete: Cascade)
+
+  @@id([foodID, ogID])
+}
+
+
 model Option {
-  opID  Int @id @default(autoincrement())
-  ogID  Int
+  opID    Int @id @default(autoincrement())
+  ogID    Int
+
   opName  String
   opPrice Float
 
-  optionGroup OptionGroup @relation(fields: [ogID], references: [ogID])
+  optionGroup OptionGroup @relation(fields: [ogID], references: [ogID], onDelete: Cascade)
+
+  options CartItemOption[]
+
+  @@index([ogID])
+}
+
+model Cart {
+  cartID     Int @id @default(autoincrement())
+  customerID Int
+  shopID     Int
+
+  items      CartItem[]
+
+  customer Customer @relation(fields: [customerID], references: [customerID], onDelete: Cascade)
+  shop     Shop     @relation(fields: [shopID], references: [shopID], onDelete: Cascade)
+
+  @@unique([customerID, shopID]) // 1 customer มี 1 cart ต่อร้าน
+  @@index([customerID])
+  @@index([shopID])
+}
+
+model CartItem {
+  cartItemID       Int @id @default(autoincrement())
+  cartID           Int
+  foodID           Int
+  cartItemQuantity Int
+  cartItemNote     String?
+  foodPriceSnapshot Float
+
+  cart    Cart @relation(fields: [cartID], references: [cartID], onDelete: Cascade)
+  food    Food @relation(fields: [foodID], references: [foodID])
+
+  options CartItemOption[]
+
+  @@index([cartID])
+  @@index([foodID])
+}
+
+model CartItemOption {
+  cartItemOptionID Int @id @default(autoincrement())
+  cartItemID       Int
+  optionID         Int
+  optionPriceSnapshot Float
+
+  cartItem CartItem @relation(fields: [cartItemID], references: [cartItemID], onDelete: Cascade)
+  option   Option   @relation(fields: [optionID], references: [opID])
+
+  @@unique([cartItemID, optionID])
 }

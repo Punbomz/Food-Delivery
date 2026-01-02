@@ -1,0 +1,2 @@
+-- AddForeignKey
+ALTER TABLE "Food" ADD CONSTRAINT "Food_foodGenreID_fkey" FOREIGN KEY ("foodGenreID") REFERENCES "FoodGenre"("fGenreID") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -35,12 +35,9 @@ export default function AddFood({ modalRef, id, onSuccess, onClose, onRequestDel
     const [type, setType] = useState<number | null>(null);
     const [price, setPrice] = useState("");
     const [options, setOptions] = useState<number[]>([]);
-    const [editMode, setEditMode] = useState(false);
-    const [pic, setPic] = useState("");
+    const [isEditing, setEditing] = useState(false);
 
     useEffect(() => {
-        setEditMode(true);
-
         getData();
     }, []);
 
@@ -54,8 +51,7 @@ export default function AddFood({ modalRef, id, onSuccess, onClose, onRequestDel
     }, [id]);
 
     const getData = async () => {
-        if(editMode) {
-            try {
+        try {
             const res = await fetch("/api/getdata/shop/food/edit", {
                 method: "POST",
                 headers: {
@@ -68,17 +64,19 @@ export default function AddFood({ modalRef, id, onSuccess, onClose, onRequestDel
 
             if (res.ok) {
                 const data = await res.json();
-                setName(data.foodName);
-                setPrice(data.foodPrice);
-                setDetails(data.foodDetails);
-                setType(data.foodGenreID);
-                setOptions(data.foodOptions);
-                setPic(data.foodPic);
-                setPreview(data.foodPic);
+                console.log(data);
+                if(data.food) {
+                    setEditing(true);
+                }
+                setName(data.food.foodName);
+                setPrice(data.food.foodPrice);
+                setDetails(data.food.foodDetails);
+                setType(data.food.foodGenreID);
+                setOptions(data.options);
+                setPreview(data.food.foodPic);
             }
-            } catch(error) {
-                console.error("Fetch genre failed:", error);
-            }
+        } catch(error) {
+            console.error("Fetch genre failed:", error);
         }
 
         // Genre
@@ -154,6 +152,7 @@ export default function AddFood({ modalRef, id, onSuccess, onClose, onRequestDel
                 setError("บันทึกรายการอาหารผิดพลาด! กรุณาลองใหม่อีกครั้ง");
             }
         }
+        setEditing(false);
         setLoading(false);
     }
 
@@ -174,7 +173,6 @@ export default function AddFood({ modalRef, id, onSuccess, onClose, onRequestDel
         setDetails("");
         setType(null);
         setOptions([]);
-        setPic("");
         setPreview(null);
     }
 
@@ -208,7 +206,7 @@ export default function AddFood({ modalRef, id, onSuccess, onClose, onRequestDel
                         setPreview(URL.createObjectURL(file));
                     }
                     }}
-                    required={!editMode}
+                    required = { !isEditing }
                 />
                 <label className="block text-sm text-black mt-3">
                 รูปอาหาร
@@ -224,7 +222,7 @@ export default function AddFood({ modalRef, id, onSuccess, onClose, onRequestDel
                     
                     <div className="w-xs">
                         <legend className="fieldset-legend">คำอธิบาย</legend>
-                        <textarea name="Details" className="textarea" placeholder="ระบุคำอธิบาย" maxLength={300} required value={details} onChange={(e) => { setDetails(e.target.value) }}></textarea>
+                        <textarea name="Details" className="textarea" placeholder="ระบุคำอธิบาย" maxLength={300} value={details} onChange={(e) => { setDetails(e.target.value) }}></textarea>
                     </div>
 
                     <div className="w-xs">
@@ -232,18 +230,19 @@ export default function AddFood({ modalRef, id, onSuccess, onClose, onRequestDel
                         {genres.length > 0 && (
                             <select
                                 name="Genre"
-                                defaultValue={type ?? genres[0].fGenreID}
+                                value={String(type)}
+                                onChange={(e) => setType(Number(e.target.value))}
                                 className="select"
                                 required
-                            >
-                            {genres.map((genre) => (
-                                <option
-                                key={genre.fGenreID}
-                                value={genre.fGenreID}
                                 >
-                                {genre.fGenreName}
-                                </option>
-                            ))}
+                                {genres.map((genre) => (
+                                    <option
+                                    key={genre.fGenreID}
+                                    value={String(genre.fGenreID)}
+                                    >
+                                    {genre.fGenreName}
+                                    </option>
+                                ))}
                             </select>
                         )}
                     </div>
