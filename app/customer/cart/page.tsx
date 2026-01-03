@@ -43,13 +43,17 @@ export default function CartPage() {
     fetchCart();
   }, []);
 
-  if (loading) return <div className="p-10 text-center">กำลังโหลด...</div>;
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <span className="loading loading-spinner"></span>
+    </div>
+  );
   if (!cart || cart.items.length === 0)
     return <div className="p-10 text-center">ไม่มีสินค้าในตะกร้า</div>;
 
   return (
     <>
-    <AlertModal
+      <AlertModal
         isOpen={isOpen}
         message={message}
         navigateTo={navigateTo}

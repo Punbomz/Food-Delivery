@@ -7,9 +7,9 @@ export default function Cart() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const isCartPage = pathname === "/customer/cart";
+  const notShow = pathname === "/customer/cart" || pathname.startsWith("/customer/orders/payment/") || pathname.startsWith("/customer/orders/");
 
-  if (loading || !cart || cart.items.length === 0 || isCartPage) return null;
+  if (loading || !cart || cart.items.length === 0 || notShow) return null;
 
   const totalPrice = cart.items.reduce((sum: number, item: any) => {
     const optionTotal = item.options.reduce(
@@ -25,7 +25,7 @@ export default function Cart() {
   }, 0);
 
   return (
-    !isCartPage && (
+    !notShow && (
       <div
         className="
           fixed bottom-4 left-1/2 -translate-x-1/2 z-[9999]

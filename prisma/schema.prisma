@@ -36,6 +36,8 @@ model Shop {
   foodgenre FoodGenre[]
   optionGroups  OptionGroup[]
   cart  Cart[]
+
+  orders Order[]
 }
 
 model Admin {
@@ -63,6 +65,8 @@ model Customer {
   sessions Session[]
   history  CustomerHistory[]
   cart  Cart[]
+
+  orders Order[]
 }
 
 model Session {
@@ -119,6 +123,8 @@ model Food {
 
   shop   Shop      @relation(fields: [shopID], references: [shopID])
   genre  FoodGenre @relation(fields: [foodGenreID], references: [fGenreID])
+
+  orderItems OrderItem[]
 }
 
 model FoodGenre {
@@ -169,6 +175,7 @@ model Option {
   options CartItemOption[]
 
   @@index([ogID])
+  orderItemOptions OrderItemOption[]
 }
 
 model Cart {
@@ -214,4 +221,65 @@ model CartItemOption {
   option   Option   @relation(fields: [optionID], references: [opID])
 
   @@unique([cartItemID, optionID])
+}
+
+model Order {
+  orderID     Int      @id @default(autoincrement())
+  customerID  Int
+  shopID      Int
+  totalPrice  Float
+  status      String
+  createdAt   DateTime @default(now())
+
+  customer    Customer @relation(fields: [customerID], references: [customerID])
+  shop        Shop     @relation(fields: [shopID], references: [shopID])
+  items       OrderItem[]
+  payment     Payment?
+
+  @@index([customerID])
+  @@index([shopID])
+}
+
+model OrderItem {
+  orderItemID Int @id @default(autoincrement())
+  orderID     Int
+  foodID      Int
+
+  foodNameSnapshot  String
+  foodPriceSnapshot Float
+  quantity          Int
+  note              String?
+
+  order   Order @relation(fields: [orderID], references: [orderID], onDelete: Cascade)
+  food    Food  @relation(fields: [foodID], references: [foodID])
+  options OrderItemOption[]
+
+  @@index([orderID])
+  @@index([foodID])
+}
+
+model OrderItemOption {
+  id Int @id @default(autoincrement())
+  orderItemID Int
+
+  optionID               Int
+  optionNameSnapshot     String
+  optionPriceSnapshot    Float
+
+  orderItem OrderItem @relation(fields: [orderItemID], references: [orderItemID], onDelete: Cascade)
+  option    Option    @relation(fields: [optionID], references: [opID])
+
+  @@index([orderItemID])
+  @@index([optionID])
+}
+
+model Payment {
+  paymentID   Int      @id @default(autoincrement())
+  orderID     Int      @unique
+  amount      Float
+  slipPic     String?
+  status      Boolean  @default(false)
+  paidAt      DateTime?
+
+  order Order @relation(fields: [orderID], references: [orderID], onDelete: Cascade)
 }
