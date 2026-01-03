@@ -392,6 +392,7 @@ export default function shopMenu() {
           }}
           onClose={() => {
             setSelectId(null);
+            getData();
           }}
           onRequestDelete={(id) => {
             showConfirm(

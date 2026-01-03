@@ -173,18 +173,19 @@ model Option {
 
 model Cart {
   cartID     Int @id @default(autoincrement())
-  customerID Int
+  customerID Int @unique
   shopID     Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   items      CartItem[]
 
   customer Customer @relation(fields: [customerID], references: [customerID], onDelete: Cascade)
   shop     Shop     @relation(fields: [shopID], references: [shopID], onDelete: Cascade)
 
-  @@unique([customerID, shopID]) // 1 customer มี 1 cart ต่อร้าน
-  @@index([customerID])
   @@index([shopID])
 }
+
 
 model CartItem {
   cartItemID       Int @id @default(autoincrement())

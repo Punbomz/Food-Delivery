@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     }
 
     const result = await prisma.$transaction(async (tx) => {
-      // ดึง food + ราคา
+      // ดึง food + ราคา snapshot
       const food = await tx.food.findUnique({
         where: { foodID },
         select: { foodPrice: true },
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
         throw new Error("Food not found");
       }
 
-      // ดึง option + ราคา (snapshot)
+      // ดึง option + ราคา snapshot
       const options = optionIDs?.length
         ? await tx.option.findMany({
             where: { opID: { in: optionIDs } },
@@ -42,17 +42,31 @@ export async function POST(req: Request) {
           })
         : [];
 
-      // หา / สร้าง cart (1 cart ต่อ shop)
-      const cart = await tx.cart.upsert({
-        where: {
-          customerID_shopID: { customerID, shopID },
-        },
-        update: {},
-        create: {
-          customerID,
-          shopID,
-        },
+      // หา cart ของ customer (มีได้แค่อันเดียว)
+      let cart = await tx.cart.findUnique({
+        where: { customerID },
       });
+
+      // ถ้ายังไม่มี cart → create
+      if (!cart) {
+        cart = await tx.cart.create({
+          data: {
+            customerID,
+            shopID,
+          },
+        });
+      }
+      //  ถ้ามี cart แต่เป็นคนละร้าน → clear cart แล้วเปลี่ยนร้าน
+      else if (cart.shopID !== shopID) {
+        await tx.cartItem.deleteMany({
+          where: { cartID: cart.cartID },
+        });
+
+        cart = await tx.cart.update({
+          where: { cartID: cart.cartID },
+          data: { shopID },
+        });
+      }
 
       // หา cart item เดิม (food เดียวกัน)
       const existingItems = await tx.cartItem.findMany({
@@ -118,7 +132,7 @@ export async function POST(req: Request) {
       cartItemID: result.cartItemID,
     });
   } catch (err) {
-    console.error("❌ CART ADD ERROR:", err);
+    console.error("CART ADD ERROR:", err);
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }

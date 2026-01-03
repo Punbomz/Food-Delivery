@@ -57,6 +57,7 @@ export function Navbar() {
             }
         } catch (error) {
             console.error("Auth check failed:", error);
+            window.location.href = "/";
         } finally {
             setLoading(false);
         }
@@ -167,14 +168,6 @@ export function Navbar() {
                                 <Suspense fallback={null}>
                                     <NavbarSearch />
                                 </Suspense>
-
-                                <Link href="/customer/cart" className='hidden lg:block'>
-                                    <i className='fas text-xl'>&#xf07a;</i>
-                                </Link>
-
-                                <Link href="/customer/cart" className='absolute right-4 lg:hidden'>
-                                    <i className='fas text-xl'>&#xf07a;</i>
-                                </Link>
                             </>
                         )}
                     </div>
