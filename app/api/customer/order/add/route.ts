@@ -65,7 +65,7 @@ export async function POST() {
         customerID,
         shopID: cart.shopID,
         totalPrice,
-        status: "pending",
+        status: "รอชำระเงิน",
         items: {
           create: cart.items.map((item) => ({
             foodID: item.foodID,

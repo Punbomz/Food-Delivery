@@ -37,6 +37,13 @@ export async function POST(request: Request) {
                 slipPic: slipUrl,
             },
         });
+
+        await prisma.order.update({
+            where: { orderID },
+            data: {
+                status: "รอยืนยันการชำระเงิน",
+            },
+        });
         } catch (error: any) {
             return NextResponse.json(
                 { message: "อัพโหลดสลิปไม่สำเร็จ!" },
