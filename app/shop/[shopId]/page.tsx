@@ -86,87 +86,89 @@ export default function ShopMenuPage() {
   }
 
   return (
-    <div className="mx-auto bg-base-200 min-h-screen">
-      {/* Header ร้าน */}
-      <div className="bg-base-100 p-5 mt-5 lg:mt-20 shadow-sm">
-        {shop.shopPic && (
-          <img
-            src={shop.shopPic}
-            alt={shop.shopName}
-            className="w-full h-40 lg:h-120 object-cover rounded-xl mb-3"
-          />
-        )}
-
-        <h1 className="text-2xl font-semibold">{shop.shopName}</h1>
-        { shop.shopDetail && (
-          <h1 className="text-xl">{shop.shopDetail}</h1>
-        )}
-
-        <span
-          className={`inline-block mt-5 px-3 py-1 rounded-full text-sm text-white
-            ${shop.shopOpen ? "bg-success" : "bg-error"}`}
-        >
-          {shop.shopOpen ? "เปิดอยู่" : "ปิดร้าน"}
-        </span>
-      </div>
-
-      <div className="flex justify-center">
-      {/* เมนู แยกหมวด */}
-        <div className="w-3xl p-4 space-y-6 bg-base-300 shadow-lg rounded-box m-5">
-          {shop.categories.length === 0 && (
-            <p className="text-center text-sm text-gray-500">
-              ยังไม่มีเมนูในร้านนี้
-            </p>
+    <>
+      <div className="mx-auto bg-base-200 min-h-screen pb-10">
+        {/* Header ร้าน */}
+        <div className="bg-base-100 p-5 mt-5 lg:mt-20 shadow-sm">
+          {shop.shopPic && (
+            <img
+              src={shop.shopPic}
+              alt={shop.shopName}
+              className="w-full h-40 lg:h-120 object-cover rounded-xl mb-3"
+            />
           )}
 
-          {shop.categories.map((cat) => (
-            <div key={cat.categoryName} className="space-y-3">
-              <h2 className="text-lg font-semibold">{cat.categoryName}</h2>
+          <h1 className="text-2xl font-semibold">{shop.shopName}</h1>
+          { shop.shopDetail && (
+            <h1 className="text-xl">{shop.shopDetail}</h1>
+          )}
 
-              {cat.foods.length === 0 && (
-                <p className="text-sm text-gray-500">ยังไม่มีเมนูในหมวดนี้</p>
-              )}
+          <span
+            className={`inline-block mt-5 px-3 py-1 rounded-full text-sm text-white
+              ${shop.shopOpen ? "bg-success" : "bg-error"}`}
+          >
+            {shop.shopOpen ? "เปิดอยู่" : "ปิดร้าน"}
+          </span>
+        </div>
 
-              {cat.foods.map((food) => (
-                <div
-                  key={food.foodID}
-                  onClick={() =>
-                    shop.shopOpen &&
-                    router.push(`/shop/${shopId}/food/${food.foodID}`)
-                  }
-                  className={`flex gap-4 p-4 bg-base-100 rounded-xl shadow-sm transition justify-between items-center
-                    ${
-                      shop.shopOpen
-                        ? "cursor-pointer active:scale-[0.98]"
-                        : "opacity-50 cursor-not-allowed"
-                    }`}
-                >
-                  <div className="flex gap-3 items-center">
-                    <img
-                      src={food.foodPic || "/no-food.png"}
-                      alt={food.foodName}
-                      className="w-20 h-20 rounded-lg object-cover"
-                    />
+        <div className="flex justify-center">
+        {/* เมนู แยกหมวด */}
+          <div className="w-3xl p-4 space-y-6 bg-base-300 shadow-lg rounded-box m-5">
+            {shop.categories.length === 0 && (
+              <p className="text-center text-sm text-gray-500">
+                ยังไม่มีเมนูในร้านนี้
+              </p>
+            )}
 
-                    <div className="flex-1">
-                      <p className="font-medium">{food.foodName}</p>
+            {shop.categories.map((cat) => (
+              <div key={cat.categoryName} className="space-y-3">
+                <h2 className="text-lg font-semibold">{cat.categoryName}</h2>
 
-                      <p className="text-xs text-gray-500 line-clamp-2">
-                        {food.foodDetails}
-                      </p>
+                {cat.foods.length === 0 && (
+                  <p className="text-sm text-gray-500">ยังไม่มีเมนูในหมวดนี้</p>
+                )}
 
-                      <p className="text-sm font-semibold text-primary mt-1">
-                        {food.foodPrice.toFixed(2)} บาท
-                      </p>
+                {cat.foods.map((food) => (
+                  <div
+                    key={food.foodID}
+                    onClick={() =>
+                      shop.shopOpen &&
+                      router.push(`/shop/${shopId}/food/${food.foodID}`)
+                    }
+                    className={`flex gap-4 p-4 bg-base-100 rounded-xl shadow-sm transition justify-between items-center
+                      ${
+                        shop.shopOpen
+                          ? "cursor-pointer active:scale-[0.98]"
+                          : "opacity-50 cursor-not-allowed"
+                      }`}
+                  >
+                    <div className="flex gap-3 items-center">
+                      <img
+                        src={food.foodPic || "/no-food.png"}
+                        alt={food.foodName}
+                        className="w-20 h-20 rounded-lg object-cover"
+                      />
+
+                      <div className="flex-1">
+                        <p className="font-medium">{food.foodName}</p>
+
+                        <p className="text-xs text-gray-500 line-clamp-2">
+                          {food.foodDetails}
+                        </p>
+
+                        <p className="text-sm font-semibold text-primary mt-1">
+                          {food.foodPrice.toFixed(2)} บาท
+                        </p>
+                      </div>
                     </div>
+                    <i className='far text-xl'>&#xf0fe;</i>  
                   </div>
-                  <i className='far text-xl'>&#xf0fe;</i>  
-                </div>
-              ))}
-            </div>
-          ))}
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

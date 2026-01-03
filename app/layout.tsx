@@ -3,6 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navbar } from './components/navbar'
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import Cart from "@/app/components/Cart";
+import { CartProvider } from "@/app/components/CartContext";
+import ContentWrapper from "@/app/components/ContentWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +34,10 @@ export default function RootLayout({
       >
         <Navbar />
         <div className="mt-15">
-          {children}
+          <CartProvider>
+            <ContentWrapper>{children}</ContentWrapper>
+            <Cart />
+          </CartProvider>
         </div>
       </body>
     </html>

@@ -1,3 +1,5 @@
+import ContentWrapper from "@/app/components/ContentWrapper";
+
 export default function ShopLayout({
   children,
 }: Readonly<{
@@ -5,7 +7,7 @@ export default function ShopLayout({
 }>) {
   return (
     <div className="bg-base h-screen">
-        {children}
+      <ContentWrapper>{children}</ContentWrapper>
     </div>
   );
 }

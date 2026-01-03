@@ -64,7 +64,6 @@ export default function AddFood({ modalRef, id, onSuccess, onClose, onRequestDel
 
             if (res.ok) {
                 const data = await res.json();
-                console.log(data);
                 if(data.food) {
                     setEditing(true);
                 }
@@ -267,26 +266,28 @@ export default function AddFood({ modalRef, id, onSuccess, onClose, onRequestDel
                             <div className="text-center">ยังไม่มีตัวเลือกเสริม</div>
                         ) : (
                             optionData.map((option: OptionData, index: number) => (
-                                <label
-                                    key={option.ogID}
-                                    className="w-full rounded-box items-center bg-accent-content flex p-3 text-black mb-2 gap-2 cursor-pointer"
-                                    >
-                                    <input
-                                        name="options"
-                                        value={option.ogID}
-                                        type="checkbox"
-                                        className="checkbox"
-                                        checked={options.includes(option.ogID)}
-                                        onChange={() => {
-                                            setOptions(prev =>
-                                            prev.includes(option.ogID)
-                                                ? prev.filter(id => id !== option.ogID)
-                                                : [...prev, option.ogID]
-                                            );
-                                        }}
-                                    />
-                                        <h1 className="text-sm lg:text-lg">{option.ogName}</h1>
-                                </label>
+                                option.ogItem.length > 0 && (
+                                    <label
+                                        key={option.ogID}
+                                        className="w-full rounded-box items-center bg-accent-content flex p-3 text-black mb-2 gap-2 cursor-pointer"
+                                        >
+                                        <input
+                                            name="options"
+                                            value={option.ogID}
+                                            type="checkbox"
+                                            className="checkbox"
+                                            checked={options.includes(option.ogID)}
+                                            onChange={() => {
+                                                setOptions(prev =>
+                                                prev.includes(option.ogID)
+                                                    ? prev.filter(id => id !== option.ogID)
+                                                    : [...prev, option.ogID]
+                                                );
+                                            }}
+                                        />
+                                            <h1 className="text-sm lg:text-lg">{option.ogName}</h1>
+                                    </label>
+                                )
                             ))
                         )}
                     </div>

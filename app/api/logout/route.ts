@@ -53,6 +53,15 @@ export async function POST() {
               customerLogout: new Date(),
             },
           });
+
+          const cart = await prisma.cart.findUnique({
+            where: { customerID: session.customerID },
+          });
+          if (cart) {
+            await prisma.cartItem.deleteMany({
+              where: { cartID: cart.cartID },
+            });
+          }
         }
       }
     }

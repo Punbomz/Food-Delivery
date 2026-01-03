@@ -1,9 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import AlertModal from "@/app/components/AlertModal";
 import { useAlertModal } from "@/app/hooks/useAlertModal";
+import ConfirmModal from '@/app/components/ConfirmModal';
+import { useConfirmModal } from "@/app/hooks/useConfirmModal";
+import { useCart } from "@/app/components/CartContext";
 
 type Option = {
   opID: number;
@@ -28,12 +31,14 @@ type Food = {
   optionGroups: OptionGroup[];
 };
 
-
 export default function FoodDetailPage() {
   const { shopId, foodId } = useParams<{
     shopId: string;
     foodId: string;
   }>();
+  
+  const searchParams = useSearchParams();
+  const editCartItemID = searchParams.get('edit');
 
   const [food, setFood] = useState<Food | null>(null);
   const [loading, setLoading] = useState(true);
@@ -43,11 +48,26 @@ export default function FoodDetailPage() {
   const [selectedOptions, setSelectedOptions] = useState<Record<number, number[]>>({});
   const [note, setNote] = useState("");
   const [amount, setAmount] = useState(1);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   const router = useRouter();
 
   const { isOpen, message, navigateTo, showAlert, closeAlert } = useAlertModal();
 
+  const { 
+      isOpen: isConfirmOpen, 
+      message: confirmMessage,
+      title: confirmTitle,
+      confirmText,
+      cancelText,
+      showConfirm, 
+      handleConfirm, 
+      handleCancel 
+  } = useConfirmModal();
+
+  const { refreshCart } = useCart();
+
+  // Load food data
   useEffect(() => {
     if (!shopId || !foodId) return;
 
@@ -66,6 +86,49 @@ export default function FoodDetailPage() {
       .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, [shopId, foodId]);
+
+  // Load cart item data if in edit mode
+  useEffect(() => {
+    if (!editCartItemID || !food) return;
+
+    const loadCartItem = async () => {
+      try {
+        const res = await fetch("/api/getdata/customer/cart", {
+          credentials: "include",
+        });
+        const { cart } = await res.json();
+        
+        if (!cart) return;
+
+        const cartItem = cart.items.find((item: any) => 
+          item.cartItemID === parseInt(editCartItemID)
+        );
+
+        if (cartItem) {
+          setIsEditMode(true);
+          setAmount(cartItem.cartItemQuantity);
+          setNote(cartItem.cartItemNote || "");
+
+          // Pre-select options
+          const optionsByGroup: Record<number, number[]> = {};
+          
+          for (const og of food.optionGroups) {
+            optionsByGroup[og.ogID] = cartItem.options
+              .filter((opt: any) => 
+                og.options.some(o => o.opID === opt.option.opID)
+              )
+              .map((opt: any) => opt.option.opID);
+          }
+
+          setSelectedOptions(optionsByGroup);
+        }
+      } catch (err) {
+        console.error("Failed to load cart item:", err);
+      }
+    };
+
+    loadCartItem();
+  }, [editCartItemID, food]);
 
   if (loading) {
     return (
@@ -105,14 +168,32 @@ export default function FoodDetailPage() {
     return Object.values(selectedOptions).flat();
   };
 
-  const handleAddToCart = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const updateCartItem = async () => {
+    if (!editCartItemID || !food) return;
 
-    if (!food) return;
+    const payload = {
+      quantity: amount,
+      note: note || null,
+      optionIDs: getSelectedOptionIDs(),
+    };
 
-    if (!validateRequiredOptions()) {
-      return;
+    const res = await fetch(`/api/customer/cart/item/${editCartItemID}/update`, {
+      credentials: "include",
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      throw new Error("Update cart item failed");
     }
+
+    await refreshCart();
+    showAlert("แก้ไขรายการสำเร็จ!", "back");
+  };
+
+  const addToCart = async () => {
+    if (!food) return;
 
     const payload = {
       shopID: Number(shopId),
@@ -122,23 +203,57 @@ export default function FoodDetailPage() {
       optionIDs: getSelectedOptionIDs(),
     };
 
-    try {
-      const res = await fetch("/api/customer/cart/add", {
-        credentials: "include",
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+    const res = await fetch("/api/customer/cart/add", {
+      credentials: "include",
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
-      if (!res.ok) {
-        throw new Error("Add to cart failed");
+    if (!res.ok) {
+      throw new Error("Add to cart failed");
+    }
+
+    await refreshCart();
+    showAlert(
+      isEditMode ? "แก้ไขรายการสำเร็จ!" : "เพิ่มลงตะกร้าแล้ว!", 
+      "back"
+    );
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!food) return;
+    if (!validateRequiredOptions()) return;
+
+    try {
+      if (isEditMode) {
+        await updateCartItem();
+        return;
       }
 
-      await res.json();
+      const cartRes = await fetch("/api/getdata/customer/cart", {
+        credentials: "include",
+      });
 
-      showAlert("เพิ่มลงตะกร้าแล้ว!", "back");
+      const { cart } = await cartRes.json();
+
+      if (cart && cart.shopID !== Number(shopId)) {
+        showConfirm(
+          "ตะกร้าของคุณมีสินค้าจากร้านอื่นอยู่\nหากเพิ่มสินค้านี้ ตะกร้าเดิมจะถูกล้าง",
+          async () => {
+            try {
+              await addToCart();
+            } catch {
+              showAlert("เกิดข้อผิดพลาด! กรุณาลองใหม่");
+            }
+          }
+        );
+        return;
+      }
+
+      await addToCart();
     } catch (err) {
       console.error(err);
       showAlert("เกิดข้อผิดพลาด! กรุณาลองใหม่");
@@ -179,9 +294,9 @@ export default function FoodDetailPage() {
   };
 
   const isOrderValid = () => {
-  if (!food) return false;
+    if (!food) return false;
 
-  return food.optionGroups.every((og) => {
+    return food.optionGroups.every((og) => {
       if (!og.ogForce) return true;
       const selected = selectedOptions[og.ogID] || [];
       return selected.length > 0;
@@ -196,27 +311,41 @@ export default function FoodDetailPage() {
         navigateTo={navigateTo}
         onClose={closeAlert}
       />
+
+      <ConfirmModal
+        isOpen={isConfirmOpen}
+        title={confirmTitle}
+        message={confirmMessage}
+        confirmText={confirmText}
+        cancelText={cancelText}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+      />
+
       <div className="mx-auto bg-base-200 min-h-screen">
         <div className="bg-base-100 min-h-screen p-5 mt-5 lg:mt-20 shadow-sm">
-
+          {/* Mobile View */}
           <div className="block lg:hidden">
             {food.foodPic && (
               <img
                 src={food.foodPic}
                 alt={food.foodName}
-                className="w-full h-40 lg:h-120 object-cover rounded-xl mb-3"
+                className="w-full h-40 object-cover rounded-xl mb-3"
               />
             )}
 
             <div>
-              <h1 className="text-xl font-semibold">{food.foodName}</h1>
+              <h1 className="text-xl font-semibold">
+                {isEditMode && <span className="text-blue-500">[แก้ไข] </span>}
+                {food.foodName}
+              </h1>
               <p className="text-sm text-gray-500">{food.foodDetails}</p>
               <p className="text-lg font-bold text-primary mt-1">
                 ราคา {food.foodPrice.toFixed(2)} บาท
               </p>
             </div>
 
-            <form className="flex flex-col justify-center" onSubmit={handleAddToCart}>
+            <form className="flex flex-col justify-center" onSubmit={handleSubmit}>
               {food.optionGroups?.map((og) => (
                 <div
                   key={og.ogID}
@@ -228,8 +357,7 @@ export default function FoodDetailPage() {
                   </h2>
 
                   {og.options.map((op) => {
-                    const checked =
-                      selectedOptions[og.ogID]?.includes(op.opID) || false;
+                    const checked = selectedOptions[og.ogID]?.includes(op.opID) || false;
 
                     return (
                       <label
@@ -246,13 +374,10 @@ export default function FoodDetailPage() {
                               handleOptionChange(og.ogID, op.opID, og.ogMultiple)
                             }
                           />
-                          <span>
-                            {op.opName}
-                          </span>
+                          <span>{op.opName}</span>
                         </div>
                         <span>
-                          {op.opPrice > 0 &&
-                            ` +${op.opPrice.toFixed(2)} บาท`}
+                          {op.opPrice > 0 && ` +${op.opPrice.toFixed(2)} บาท`}
                         </span>
                       </label>
                     );
@@ -266,38 +391,50 @@ export default function FoodDetailPage() {
               ))}
 
               <fieldset className="fieldset mt-5">
-                <legend className="fieldset-legend text-sm lg:text-lg">หมายเหตุ</legend>
-                <textarea name="Note" className="textarea h-24 w-full p-2 border rounded-lg" placeholder="เช่น ลดหวาน, ใส่พริกเพิ่ม" rows={3} value={note} onChange={(e) => setNote(e.target.value)}></textarea>
+                <legend className="fieldset-legend text-sm">หมายเหตุ</legend>
+                <textarea
+                  className="textarea h-24 w-full p-2 border rounded-lg"
+                  placeholder="เช่น ลดหวาน, ใส่พริกเพิ่ม"
+                  rows={3}
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                ></textarea>
               </fieldset>
 
               <div className="flex flex-col justify-center mt-3">
                 <div className="text-center">เลือกจำนวน</div>
                 <div className="flex gap-3 justify-center items-center mx-auto mt-2">
-                  <div className="flex items-center p-3 hover:cursor-pointer btn text-xl rounded-full" onClick={() => 
-                    { if(amount-1 > 0) {
-                      setAmount(amount-1);
-                    } else {
-                      setAmount(1);
-                    }}}>-</div>
-                  <div className="border border-2 rounded-full w-25 p-1 text-center text-xl">{amount}</div>
-                  <div className="flex items-center p-3 hover:cursor-pointer btn text-xl rounded-full" onClick={() =>  setAmount(amount+1)}>+</div>
+                  <button
+                    type="button"
+                    className="btn btn-circle"
+                    onClick={() => setAmount(Math.max(1, amount - 1))}
+                  >
+                    -
+                  </button>
+                  <div className="border border-2 rounded-full w-25 p-1 text-center text-xl">
+                    {amount}
+                  </div>
+                  <button
+                    type="button"
+                    className="btn btn-circle"
+                    onClick={() => setAmount(amount + 1)}
+                  >
+                    +
+                  </button>
                 </div>
               </div>
 
               <button
                 type="submit"
                 disabled={!isOrderValid()}
-                className={`w-50 py-3 font-semibold mt-5 mx-auto rounded-full
-                  ${
-                    isOrderValid()
-                      ? "bg-success text-white"
-                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  }
-                `}
+                className={`w-full py-3 font-semibold mt-5 rounded-full ${
+                  isOrderValid()
+                    ? "bg-success text-white"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                }`}
               >
-                สั่งซื้อ • {calculateTotalPrice().toFixed(2)} บาท
+                {isEditMode ? "บันทึกการแก้ไข" : "สั่งซื้อ"} • {calculateTotalPrice().toFixed(2)} บาท
               </button>
-
             </form>
           </div>
 
@@ -337,7 +474,7 @@ export default function FoodDetailPage() {
                       </div>
                     </div>
 
-                    <form className="flex flex-col w-100 justify-center" onSubmit={handleAddToCart}>
+                    <form className="flex flex-col w-100 justify-center" onSubmit={handleSubmit}>
                       {food.optionGroups?.map((og) => (
                         <div
                           key={og.ogID}
@@ -402,7 +539,7 @@ export default function FoodDetailPage() {
                           }
                         `}
                       >
-                        สั่งซื้อ • {calculateTotalPrice().toFixed(2)} บาท
+                        {isEditMode ? "แก้ไข" : "สั่งซื้อ"} • {calculateTotalPrice().toFixed(2)} บาท
                       </button>
                     </form>
 
